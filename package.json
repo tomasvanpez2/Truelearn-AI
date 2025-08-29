@@ -1,6 +1,6 @@
 {
   "name": "detector-ia-academico",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Sistema de detección de IA en trabajos académicos",
   "main": "src/server.js",
   "scripts": {
