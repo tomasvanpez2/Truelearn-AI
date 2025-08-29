@@ -1,0 +1,25 @@
+REPORTE DIARIO DE CONSUMO DE TOKENS
+Fecha: 23/7/2025
+Hora de generación: 19:22:25
+============================================================
+
+ESTADÍSTICAS GENERALES:
+- Total de usuarios activos: 1
+- Total de tokens consumidos: 3.612
+- Total de solicitudes: 1
+- Promedio de tokens por usuario: 3.612
+- Promedio de tokens por solicitud: 3612
+
+RANKING DE USUARIOS POR CONSUMO:
+============================================================
+1. a
+   - Total de tokens: 3.612
+   - Tokens de entrada: 1.898
+   - Tokens de salida: 1.714
+   - Número de solicitudes: 1
+   - Promedio por solicitud: 3612
+   - Porcentaje del total: 100.00%
+
+TOP 5 USUARIOS CON MAYOR CONSUMO:
+========================================
+1. a: 3.612 tokens

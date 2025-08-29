@@ -1,0 +1,150 @@
+/* Importar variables de colores */
+@import url('./variables.css');
+
+/* Estilos para formularios */
+
+.form-group {
+    margin-bottom: 1.5rem;
+    position: relative;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--color-primary);
+    font-size: 0.95rem;
+}
+
+.form-group input[type="text"],
+.form-group input[type="number"],
+.form-group input[type="email"],
+.form-group input[type="password"],
+.form-group textarea,
+.form-group select {
+    width: 100%;
+    padding: 0.75rem 1rem;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 1rem;
+    color: #333;
+    background-color: #fff;
+    transition: border-color 0.3s, box-shadow 0.3s;
+}
+
+.form-group input[type="file"] {
+    padding: 0.5rem 0;
+    font-size: 0.95rem;
+}
+
+.form-group input:focus,
+.form-group textarea:focus,
+.form-group select:focus {
+    outline: none;
+    border-color: var(--color-primary);
+    box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.2);
+}
+
+.form-group input::placeholder,
+.form-group textarea::placeholder {
+    color: #aaa;
+}
+
+/* Estilos para el contenedor de temas */
+.topics-container {
+    margin-bottom: 1rem;
+}
+
+.topic-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.75rem;
+}
+
+.topic-item input {
+    flex: 1;
+    margin-right: 0.5rem;
+}
+
+.remove-topic-btn {
+    background-color: #e74c3c;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 12px;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: background-color 0.3s;
+}
+
+.remove-topic-btn:hover {
+    background-color: #c0392b;
+}
+
+.add-topic-btn {
+    background-color: var(--color-secondary);
+    color: var(--color-black);
+    border: none;
+    border-radius: 4px;
+    padding: 0.5rem 1rem;
+    font-size: 0.9rem;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    transition: background-color 0.3s;
+    margin-top: 0.5rem;
+}
+
+.add-topic-btn:hover {
+    background-color: var(--color-secondary-dark);
+}
+
+/* Estilos para la sección académica */
+.academic-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 1rem;
+    margin-bottom: 1rem;
+    width: 100%;
+}
+
+/* Estilos para alinear campos específicos */
+.academic-info .form-group {
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.academic-info .form-group:nth-child(1),
+.academic-info .form-group:nth-child(3) {
+    grid-column: 1;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.academic-info .form-group:nth-child(2),
+.academic-info .form-group:nth-child(4),
+.academic-info .form-group:nth-child(5) {
+    grid-column: 2;
+    width: 100%;
+    margin-bottom: 0;
+}
+
+.academic-info .form-group input,
+.academic-info .form-group select {
+    box-sizing: border-box;
+    width: 100%;
+}
+
+@media (max-width: 768px) {
+    .academic-info {
+        grid-template-columns: 1fr;
+    }
+    
+    .academic-info .form-group:nth-child(n) {
+        grid-column: 1;
+    }
+}

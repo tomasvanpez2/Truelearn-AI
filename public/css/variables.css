@@ -1,0 +1,46 @@
+/* Variables de colores para toda la aplicación */
+:root {
+    /* Colores principales */
+    --color-primary: #38348a;
+    /* Azul principal */
+    --color-primary-dark: #2d2a6b;
+    /* Azul más oscuro para hover */
+    --color-primary-light: #4a45a3;
+    /* Azul más claro */
+
+    --color-secondary: #fdc43a;
+    /* Amarillo secundario */
+    --color-secondary-dark: #e6b034;
+    /* Amarillo más oscuro para hover */
+    --color-secondary-light: #fed96b;
+    /* Amarillo más claro */
+
+    --color-tertiary: #e8e4ff;
+    /* Azul lavanda claro */
+    --color-tertiary-dark: #d4cdff;
+    /* Lavanda más oscuro */
+    --color-tertiary-light: #f4f2ff;
+    /* Lavanda más claro */
+
+    /* Colores de estado (mantener algunos específicos) */
+    --color-success: #27ae60;
+    /* Verde para éxito */
+    --color-danger: #e74c3c;
+    /* Rojo para peligro */
+    --color-warning: var(--color-secondary);
+    /* Usar amarillo para advertencias */
+    --color-info: var(--color-primary);
+    /* Usar azul para información */
+
+    /* Colores neutros */
+    --color-white: #ffffff;
+    --color-light-gray: #f8f9fa;
+    --color-gray: #6c757d;
+    --color-dark-gray: #495057;
+    --color-black: #2c3e50;
+
+    /* Gradientes */
+    --gradient-primary: linear-gradient(135deg, var(--color-primary), var(--color-primary-dark));
+    --gradient-secondary: linear-gradient(135deg, var(--color-secondary), var(--color-secondary-dark));
+    --gradient-tertiary: linear-gradient(135deg, var(--color-tertiary), var(--color-tertiary-dark));
+}

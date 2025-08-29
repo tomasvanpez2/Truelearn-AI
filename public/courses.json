@@ -1,0 +1,90 @@
+{
+  "Grado 1º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 2º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 3º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 4º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 5º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 6º": {
+    "Cosmos": ["Mezclas"],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 7º": {
+    "Cosmos": ["Compuestos"],
+    "Matematicas": ["Álgebra", "Geometría"],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 8º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 9º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 10º": {
+    "Cosmos": [],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "Grado 11º": {
+    "Cosmos": ["Física Cuántica"],
+    "Matematicas": ["Cálculo"],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  }
+}

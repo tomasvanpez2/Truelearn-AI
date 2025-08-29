@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>IA Co. - Dashboard</title>
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/forms.css">
+    <link rel="stylesheet" href="/css/buttons.css">
+    <link rel="stylesheet" href="/css/file-input.css">
+    <link rel="stylesheet" href="/css/analysis.css">
+    <link rel="stylesheet" href="/css/admin.css">
+</head>
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <img src="/images/L.png" alt="GLA Logo" class="header-logo">
+            <div class="user-info">
+                <span id="username-display">Usuario</span>
+                <button id="logout-button" class="btn btn-outline">Cerrar Sesión</button>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="container">
+            <section class="welcome-section">
+                <h2>Bienvenido al Sistema de GLA</h2>
+                <p>Utilice esta herramienta para analizar textos y determinar si fueron generados por inteligencia artificial.</p>
+            </section>
+
+            <section class="upload-section">
+                <h3>Subir Documento para Análisis</h3>
+                <form id="upload-form">
+                    <div class="form-group">
+                        <label for="upload-option">Seleccione una opción:</label>
+                        <select id="upload-option" name="uploadOption">
+                            <option value="file">Subir archivo</option>
+                            <option value="text">Pegar texto</option>
+                        </select>
+                    </div>
+
+                    <div id="file-upload-section" class="form-group">
+                        <label for="document-upload">Seleccione un archivo:</label>
+                        <div class="custom-file-input">
+                            <input type="file" id="document-upload" name="document" accept=".txt,.docx,.pptx,.xlsx">
+                            <label for="document-upload" class="custom-file-label">Seleccionar archivo</label>
+                        </div>
+                    </div>
+
+                    <div id="text-upload-section" class="form-group" style="display: none;">
+                        <label for="text-input">Pegue el texto aquí:</label>
+                        <textarea id="text-input" name="textInput" rows="6" placeholder="Pegue el texto para analizar..."></textarea>
+                    </div>
+
+                    <h4>Información Académica del Estudiante</h4>
+                    <div class="academic-info">
+                        <div class="form-group">
+                            <label for="student-name">Nombre del Estudiante:</label>
+                            <input type="text" id="student-name" name="studentName" placeholder="Nombre completo del estudiante" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="student-grade">Grado del Estudiante:</label>
+                            <input type="text" id="student-grade" name="studentGrade" readonly>
+                        </div>
+                        <div class="form-group">
+                            <label for="attendance-hours">Horas Asistidas a Clase:</label>
+                            <input type="number" id="attendance-hours" name="attendanceHours" min="0" placeholder="Ej: 45">
+                        </div>
+                        <div class="form-group">
+                            <label for="total-hours">Total de Horas del Curso:</label>
+                            <input type="number" id="total-hours" name="totalHours" min="0" placeholder="Ej: 60">
+                        </div>
+                        <div class="form-group">
+                            <label for="student-grade-value">Calificación del Estudiante:</label>
+                            <input type="number" id="student-grade-value" name="studentGradeValue" min="1" max="5" step="0.1" placeholder="Ej: 3.5" title="Calificación en escala de 1 a 5, nota mínima de aprobación: 3.5">
+                        </div>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="class-topics">Temas Expuestos en Clase:</label>
+                        <div class="topics-container" id="topics-container">
+                            <div class="topic-item">
+                                <input type="text" name="topics[]" placeholder="Ingrese un tema expuesto en clase">
+                                <button type="button" class="remove-topic-btn">X</button>
+                            </div>
+                        </div>
+                        <button type="button" class="add-topic-btn" id="add-topic-btn">+ Añadir Tema</button>
+                    </div>
+                    
+                    <div class="form-group">
+                        <label for="context">Contexto adicional:</label>
+                        <textarea id="context" name="context" rows="4" placeholder="Describa el contexto en el que se generó este documento, instrucciones dadas, etc..."></textarea>
+                    </div>
+                    
+                    <div class="form-group">
+                        <button type="submit" class="btn btn-primary">Analizar Documento</button>
+                    </div>
+                </form>
+            </section>
+            
+            <section class="recent-analyses">
+                <h3>Análisis Recientes</h3>
+                <div class="analyses-list" id="analyses-list">
+                    <p>No hay análisis recientes.</p>
+                </div>
+            </section>
+
+            <section class="admin-section" id="admin-section" style="display: none;">
+                <h3>Gestión de Usuarios</h3>
+                <button id="add-user-btn" class="btn btn-primary">Agregar Usuario</button>
+                <div class="users-table-container">
+                    <table class="users-table">
+                        <thead>
+                            <tr>
+                                <th>Usuario</th>
+                                <th>Rol</th>
+                                <th>Estado</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-table-body">
+                        </tbody>
+                    </table>
+                </div>
+
+                <div id="user-modal" class="modal" style="display: none;">
+                    <div class="modal-content">
+                        <h4>Gestionar Usuario</h4>
+                        <form id="user-form" class="user-form">
+                            <div class="form-group">
+                                <label for="username">Nombre de Usuario:</label>
+                                <input type="text" id="username" name="username" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="password">Contraseña:</label>
+                                <input type="password" id="password" name="password">
+                            </div>
+                            <div class="form-group">
+                                <label for="role">Rol:</label>
+                                <select id="role" name="role" required>
+                                    <option value="teacher">Profesor</option>
+                                    <option value="admin">Administrador</option>
+                                </select>
+                            </div>
+                            <div class="form-group">
+                                <label for="active">Estado:</label>
+                                <select id="active" name="active" required>
+                                    <option value="true">Activo</option>
+                                    <option value="false">Inactivo</option>
+                                </select>
+                            </div>
+                            <button type="submit" class="btn btn-primary">Guardar</button>
+                            <button type="button" class="btn btn-outline" onclick="closeUserModal()">Cancelar</button>
+                        </form>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>&copy; 2025 GLA - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/js/dashboard.js"></script>
+    <script src="/js/fileUpload.js"></script>
+    <script src="/js/displayAnalysisResults.js"></script>
+    <script>
+        document.getElementById('upload-option').addEventListener('change', function() {
+            const fileSection = document.getElementById('file-upload-section');
+            const textSection = document.getElementById('text-upload-section');
+
+            if (this.value === 'file') {
+                fileSection.style.display = 'block';
+                textSection.style.display = 'none';
+            } else {
+                fileSection.style.display = 'none';
+                textSection.style.display = 'block';
+            }
+        });
+    </script>
+</body>
+</html>

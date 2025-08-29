@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLA - Selector</title>
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/selector.css">
+</head>
+<body>
+    <div class="selector-container">
+        <section class="selector-section">
+                <h2>Selección de Curso y Estudiante</h2>
+                <div class="form-group">
+                    <label for="course-select">Seleccione un Grado:</label>
+                    <select id="course-select" name="course">
+                        <!-- Opciones de cursos se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <div class="form-group" id="subject-select-group" style="display:none;">
+                    <label for="subject-select">Seleccione una Materia:</label>
+                    <select id="subject-select" name="subject">
+                        <!-- Opciones de materias se cargarán dinámicamente -->
+                    </select>
+                </div>
+                <!-- Campo de horas totales del curso, alineado y con mismo estilo que la materia -->
+                <div class="form-group" id="course-hours-group" style="display: none; margin-bottom: 16px;">
+                    <label for="course-hours">Horas totales del curso:</label>
+                    <input type="number" id="course-hours" name="course-hours" min="1" placeholder="Ingrese las horas totales" style="width: 100%; height: 38px; font-size: 16px; box-sizing: border-box;">
+                </div>
+                <!-- Sección de gestión de temas -->
+                <div id="topic-management" style="display: none; margin-bottom: 24px;">
+                    <h3>Temas trabajados en la materia</h3>
+                    <ul id="topic-list" style="margin-bottom: 12px;"></ul>
+                    <div style="display: flex; gap: 10px;">
+                        <button id="add-topic-btn" class="btn btn-secondary" type="button">Agregar Tema</button>
+                        <button id="delete-topic-btn" class="btn btn-danger" type="button">Eliminar Tema</button>
+                        <button id="proceed-to-student-btn" class="btn btn-primary" type="button">Proceder a la selección del estudiante</button>
+                    </div>
+                </div>
+
+                <div id="student-management" style="display: none;">
+                    <h3>Gestión de Estudiantes</h3>
+                    <div class="form-group">
+                        <label for="student-select">Seleccione un Estudiante:</label>
+                        <select id="student-select" name="student">
+                            <!-- Opciones de estudiantes se cargarán dinámicamente -->
+                        </select>
+                    </div>
+                    <button id="add-student-btn" class="btn btn-secondary">Agregar Estudiante</button>
+                    <button id="edit-student-btn" class="btn btn-secondary" disabled>Editar Estudiante</button>
+                    <button id="delete-student-btn" class="btn btn-danger" disabled>Eliminar Estudiante</button>
+                </div>
+                 <button id="continue-to-dashboard" class="btn btn-primary" style="display: none;">Continuar al Dashboard</button>
+            </section>
+
+            <!-- Modal para agregar/editar estudiante -->
+            <div id="student-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <h4 id="student-modal-title">Agregar Estudiante</h4>
+                    <form id="student-form">
+                        <input type="hidden" id="student-id" name="studentId">
+                        <div class="form-group">
+                            <label for="student-name">Nombre del Estudiante:</label>
+                            <input type="text" id="student-name" name="studentName" required>
+                        </div>
+                        <button type="submit" class="btn btn-primary">Guardar</button>
+                        <button type="button" class="btn btn-outline" id="cancel-student-modal">Cancelar</button>
+                    </form>
+                </div>
+            </div>
+        </section>
+        <!-- Botón de administración (solo visible para admins) -->
+        <div id="admin-section" style="display: none; text-align: center; margin-top: 30px;">
+            <a href="/admin-dashboard.html" class="btn btn-admin" style="background: linear-gradient(135deg, var(--color-primary), var(--color-tertiary)); color: white; text-decoration: none; padding: 12px 24px; border-radius: 25px; font-weight: bold;">
+                🛠️ Panel de Administración
+            </a>
+        </div>
+
+        <footer class="dashboard-footer">
+            <p>&copy; 2025 GLA - Todos los derechos reservados</p>
+        </footer>
+    </div>
+
+    <script src="/js/selector.js"></script>
+</body>
+</html>

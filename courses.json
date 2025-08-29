@@ -1,0 +1,26 @@
+{
+  "6to": {
+    "Cosmos": ["Mezclas"],
+    "Matematicas": [],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "7mo": {
+    "Cosmos": ["Compuestos"],
+    "Matematicas": ["Álgebra", "Geometría"],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  },
+  "11º": {
+    "Cosmos": ["Física Cuántica"],
+    "Matematicas": ["Cálculo"],
+    "Sapiens": [],
+    "Español": [],
+    "Ingles": [],
+    "Proyectos": []
+  }
+}

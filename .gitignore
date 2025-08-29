@@ -1,0 +1,33 @@
+# Dependencias
+node_modules/
+
+
+# Archivos temporales
+uploads/*
+!uploads/.gitkeep
+
+# Logs
+logs
+*.log
+npm-debug.log*
+
+# Archivos del sistema
+.DS_Store
+Thumbs.db
+
+# Archivos de IDE
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# Archivos de compilación
+dist/
+build/
+
+# Archivos de caché
+.cache/
+.npm/
+
+# Archivos locales de desarrollo
+*.local

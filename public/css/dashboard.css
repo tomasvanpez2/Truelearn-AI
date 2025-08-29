@@ -1,0 +1,232 @@
+/* Importar variables de colores */
+@import url('./variables.css');
+
+/* Estilos para el Dashboard */
+
+/* Estilos generales */
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--color-white);
+    color: var(--color-black);
+    line-height: 1.6;
+    margin: 0;
+    padding: 0;
+}
+
+.container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Header */
+.dashboard-header {
+    background: var(--gradient-primary);
+    color: white;
+    padding: 1.5rem 0;
+    box-shadow: 0 2px 10px rgba(0, 0, 0, 0.2);
+    position: sticky;
+    top: 0;
+    z-index: 100;
+}
+
+.dashboard-header .container {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.header-logo {
+    height: 60px;
+    width: auto;
+    margin: 0;
+}
+
+.user-info {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+#username-display {
+    font-weight: 500;
+    background-color: rgba(255, 255, 255, 0.2);
+    padding: 5px 10px;
+    border-radius: 20px;
+}
+
+/* Main content */
+.dashboard-main {
+    padding: 2rem 0;
+}
+
+.welcome-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    text-align: center;
+    border-top: 4px solid var(--color-primary);
+}
+
+.welcome-section h2 {
+    color: var(--color-primary);
+    margin-top: 0;
+    font-size: 1.8rem;
+}
+
+/* Upload section */
+.upload-section {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid var(--color-secondary);
+}
+
+.upload-section h3, .upload-section h4 {
+    color: var(--color-primary);
+    margin-top: 0;
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--color-tertiary);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.upload-section h4 {
+    font-size: 1.3rem;
+    margin-top: 1.5rem;
+    padding-bottom: 8px;
+}
+
+/* Recent analyses */
+.recent-analyses {
+    background-color: white;
+    border-radius: 8px;
+    padding: 2rem;
+    margin-bottom: 2rem;
+    box-shadow: 0 2px 15px rgba(0, 0, 0, 0.05);
+    border-left: 4px solid var(--color-tertiary-dark);
+}
+
+.recent-analyses h3 {
+    color: var(--color-primary);
+    margin-top: 0;
+    font-size: 1.5rem;
+    border-bottom: 1px solid var(--color-tertiary);
+    padding-bottom: 10px;
+    margin-bottom: 20px;
+}
+
+.analyses-list {
+    background-color: var(--color-tertiary-light);
+    border-radius: 6px;
+    padding: 1rem;
+}
+
+/* Footer */
+.dashboard-footer {
+    background-color: var(--color-primary-dark);
+    color: rgba(255, 255, 255, 0.7);
+    padding: 1.5rem 0;
+    text-align: center;
+    margin-top: 2rem;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard-header .container {
+        flex-direction: column;
+        gap: 10px;
+    }
+    
+    .user-info {
+        margin-top: 10px;
+    }
+}
+
+/* Estilos para la sección de información académica */
+.academic-info {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 8px;
+    margin-bottom: 8px;
+    width: 100%;
+}
+
+.academic-info .form-group {
+    margin-bottom: 0.5rem;
+    width: 100%;
+}
+
+.academic-info label {
+    display: block;
+    margin-bottom: 8px;
+    font-weight: 500;
+    color: var(--color-primary);
+}
+
+.academic-info input,
+.academic-info textarea,
+.academic-info select {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 4px;
+    font-size: 14px;
+    transition: border-color 0.3s;
+}
+
+.academic-info input:focus,
+.academic-info textarea:focus,
+.academic-info select:focus {
+    border-color: var(--color-primary);
+    outline: none;
+    box-shadow: 0 0 0 2px rgba(52, 152, 219, 0.2);
+}
+
+.topics-container {
+    margin-top: 10px;
+}
+
+.topic-item {
+    display: flex;
+    align-items: center;
+    margin-bottom: 8px;
+}
+
+.topic-item input {
+    flex-grow: 1;
+    margin-right: 8px;
+}
+
+.add-topic-btn {
+    background-color: var(--color-secondary);
+    color: var(--color-black);
+    border: none;
+    border-radius: 4px;
+    padding: 5px 10px;
+    cursor: pointer;
+    font-size: 14px;
+    margin-top: 8px;
+}
+
+.add-topic-btn:hover {
+    background-color: var(--color-secondary-dark);
+}
+
+.remove-topic-btn {
+    background-color: var(--color-danger);
+    color: white;
+    border: none;
+    border-radius: 4px;
+    padding: 5px 8px;
+    cursor: pointer;
+    font-size: 12px;
+}
+
+.remove-topic-btn:hover {
+    background-color: var(--color-danger);
+}
