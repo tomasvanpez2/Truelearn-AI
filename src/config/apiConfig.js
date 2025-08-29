@@ -1,12 +1,12 @@
-// Configuración para la API de OpenRouter con Gemini
+// Configuración para la API de OpenAI
 module.exports = {
     // Configuración de la API
     api: {
-        baseUrl: 'https://openrouter.ai/api/v1',
-        model: 'qwen/qwen3-235b-a22b:free',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-4',
         maxTokens: 10000,
         temperature: 0.5,
-        apiKey: process.env.OPENROUTER_API_KEY
+        apiKey: process.env.OPENAI_API_KEY
     },
 
     // Configuración de análisis

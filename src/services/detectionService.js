@@ -1,10 +1,10 @@
 const fileParser = require('./fileParser');
-const deepseekService = require('./deepseekService');
+const openaiService = require('./openaiService');
 const aiAnalysisTracker = require('../../procesos/ai-analysis-tracker');
 
 class DetectionService {
     constructor() {
-        this.deepseekService = deepseekService;
+        this.openaiService = openaiService;
     }
 
     /**
@@ -24,7 +24,7 @@ class DetectionService {
             }
 
             // Enviar el texto a la API para análisis
-            const analysisResult = await this.deepseekService.analyzeText(extractedText, context);
+            const analysisResult = await this.openaiService.analyzeText(extractedText, context);
             
             // Extraer el porcentaje de IA del resultado
             if (analysisResult && analysisResult.content && context.studentName) {
@@ -100,7 +100,7 @@ class DetectionService {
             const extractedText = await fileParser.extractText(filePath);
             
             // Generar preguntas basadas en el contenido
-            const questionsResult = await this.deepseekService.generateQuestions(extractedText, context);
+            const questionsResult = await this.openaiService.generateQuestions(extractedText, context);
             
             return {
                 success: true,
