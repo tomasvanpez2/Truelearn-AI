@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestión de Profesores - IA Co.</title>
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/dashboard.css">
+    <link rel="stylesheet" href="/css/forms.css">
+    <link rel="stylesheet" href="/css/buttons.css">
+    <link rel="stylesheet" href="/css/admin.css">
+    <link rel="stylesheet" href="/css/teachers.css">
+</head>
+
+<body>
+    <header class="dashboard-header">
+        <div class="container">
+            <img src="/images/L.png" alt="GLA Logo" class="header-logo">
+            <div class="header-nav">
+                <a href="/selector.html" class="btn btn-outline">→Ir al Selector</a>
+                <div class="user-info">
+                    <span id="username-display">Usuario</span>
+                    <button id="logout-button" class="btn btn-outline">Cerrar Sesión</button>
+                </div>
+            </div>
+        </div>
+    </header>
+
+    <main class="dashboard-main">
+        <div class="container">
+            <section class="page-header">
+                <h2>Gestión de Profesores</h2>
+                <p>Administre las cuentas de profesores de su plataforma</p>
+            </section>
+
+            <section class="teachers-actions">
+                <button id="add-teacher-btn" class="btn btn-primary">
+                    <span class="icon">+</span>
+                    Agregar Profesor
+                </button>
+                <button id="refresh-teachers-btn" class="btn btn-outline">
+                    <span class="icon">↻</span>
+                    Actualizar Lista
+                </button>
+            </section>
+
+            <section class="teachers-list">
+                <div class="teachers-table-container">
+                    <table class="teachers-table">
+                        <thead>
+                            <tr>
+                                <th>Nombre</th>
+                                <th>Email</th>
+                                <th>Usuario</th>
+                                <th>Materia</th>
+                                <th>Estado</th>
+                                <th>Fecha Creación</th>
+                                <th>Acciones</th>
+                            </tr>
+                        </thead>
+                        <tbody id="teachers-table-body">
+                            <tr>
+                                <td colspan="7" class="loading">Cargando profesores...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- Modal para agregar/editar profesor -->
+            <div id="teacher-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4 id="modal-title">Agregar Profesor</h4>
+                        <button class="modal-close" onclick="closeTeacherModal()">&times;</button>
+                    </div>
+                    <form id="teacher-form" class="teacher-form">
+                        <div class="form-group">
+                            <label for="teacher-name">Nombre Completo:</label>
+                            <input type="text" id="teacher-name" name="name" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-email">Email:</label>
+                            <input type="email" id="teacher-email" name="email" required>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-username">Nombre de Usuario:</label>
+                            <input type="text" id="teacher-username" name="username" required>
+                        </div>
+                        <div class="form-group" id="password-group">
+                            <label for="teacher-password">Contraseña:</label>
+                            <input type="password" id="teacher-password" name="password" minlength="6">
+                            <small>Mínimo 6 caracteres</small>
+                        </div>
+                        <div class="form-group">
+                            <label for="teacher-subject">Materia:</label>
+                            <input type="text" id="teacher-subject" name="subject"
+                                placeholder="Ej: Matemáticas, Historia, etc.">
+                        </div>
+                        <div class="form-group" id="active-group" style="display: none;">
+                            <label for="teacher-active">Estado:</label>
+                            <select id="teacher-active" name="active">
+                                <option value="true">Activo</option>
+                                <option value="false">Inactivo</option>
+                            </select>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary" id="submit-btn">Crear Profesor</button>
+                            <button type="button" class="btn btn-outline"
+                                onclick="closeTeacherModal()">Cancelar</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Modal de confirmación para eliminar -->
+            <div id="delete-modal" class="modal" style="display: none;">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h4>Confirmar Eliminación</h4>
+                        <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
+                    </div>
+                    <div class="modal-body">
+                        <p>¿Está seguro de que desea eliminar al profesor <strong id="delete-teacher-name"></strong>?
+                        </p>
+                        <p class="warning">Esta acción no se puede deshacer.</p>
+                    </div>
+                    <div class="form-actions">
+                        <button id="confirm-delete-btn" class="btn btn-danger">Eliminar</button>
+                        <button class="btn btn-outline" onclick="closeDeleteModal()">Cancelar</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <footer class="dashboard-footer">
+        <div class="container">
+            <p>&copy; 2025 GLA - Todos los derechos reservados</p>
+        </div>
+    </footer>
+
+    <script src="/js/auth.js"></script>
+    <script src="/js/teachers-management.js"></script>
+</body>
+
+</html>

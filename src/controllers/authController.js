@@ -1,46 +1,16 @@
-const fs = require('fs');
-const path = require('path');
 const jwt = require('jsonwebtoken');
+const bcrypt = require('bcryptjs');
+const dataService = require('../services/dataService');
 const { JWT_SECRET, JWT_EXPIRATION } = process.env;
 
-const userConfig = require('../../users.config.js');
-
 const authController = {
-    signup: async (req, res) => {
-        try {
-            const { username, password } = req.body;
-
-            if (!username || !password) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'Usuario y contraseña son requeridos'
-                });
-            }
-
-            const envPath = path.resolve(__dirname, '../../.env');
-            let envContent = fs.readFileSync(envPath, 'utf8');
-
-            envContent = envContent.replace(/^APP_USERNAME=.*/m, `APP_USERNAME=${username}`);
-            envContent = envContent.replace(/^APP_PASSWORD=.*/m, `APP_PASSWORD=${password}`);
-
-            fs.writeFileSync(envPath, envContent);
-
-            return res.status(200).json({
-                success: true,
-                message: 'Usuario registrado exitosamente'
-            });
-        } catch (error) {
-            console.error('Error en signup:', error);
-            return res.status(500).json({
-                success: false,
-                message: 'Error en el servidor'
-            });
-        }
-    },
-
+    // Registro de nuevos administradores
+    // IMPORTANTE: Solo se pueden registrar administradores en este sistema
+    // Cada admin tendrá su propia plataforma independiente para gestionar profesores
     register: async (req, res) => {
         try {
-            const { username, password } = req.body;
+            const { username, password, role = 'admin', name, email } = req.body;
+            
             if (!username || !password) {
                 return res.status(400).json({
                     success: false,
@@ -48,55 +18,62 @@ const authController = {
                 });
             }
 
-            // No permitir registrar el admin principal
-            if (username === process.env.APP_USERNAME) {
+            if (password.length < 6) {
                 return res.status(400).json({
                     success: false,
-                    message: 'No se puede registrar el usuario admin principal'
+                    message: 'La contraseña debe tener al menos 6 caracteres'
                 });
             }
 
-            const envPath = path.resolve(__dirname, '../../.env');
-            let envContent = fs.readFileSync(envPath, 'utf8');
+            // Verificar si el usuario ya existe
+            const existingUser = await dataService.findUserByUsername(username);
+            if (existingUser) {
+                return res.status(400).json({
+                    success: false,
+                    message: 'El usuario ya existe'
+                });
+            }
 
-            // Buscar slots disponibles
-            let slot = null;
-            for (let i = 1; i <= 5; i++) {
-                const userKey = `APP_USERNAME${i}`;
-                const passKey = `APP_PASSWORD${i}`;
-                const userRegex = new RegExp(`^${userKey}=(.*)$`, 'm');
-                const passRegex = new RegExp(`^${passKey}=(.*)$`, 'm');
-                const userMatch = envContent.match(userRegex);
-                const passMatch = envContent.match(passRegex);
-                
-                // Verificar si el slot está vacío (sin valor después del =)
-                if (userMatch && passMatch && (!userMatch[1] || userMatch[1].trim() === '') && (!passMatch[1] || passMatch[1].trim() === '')) {
-                    slot = i;
-                    break;
-                }
-                // Evitar duplicados
-                if (userMatch && userMatch[1] && userMatch[1].trim() === username) {
+            // Verificar email si se proporciona
+            if (email) {
+                const existingEmail = await dataService.findUserByEmail(email);
+                if (existingEmail) {
                     return res.status(400).json({
                         success: false,
-                        message: 'El usuario ya existe'
+                        message: 'El email ya está registrado'
                     });
                 }
             }
-            if (!slot) {
-                return res.status(400).json({
-                    success: false,
-                    message: 'No hay más slots disponibles para usuarios (máximo 5 usuarios normales)'
-                });
-            }
 
-            // Escribir usuario y contraseña en el slot encontrado
-            envContent = envContent.replace(new RegExp(`^APP_USERNAME${slot}=.*$`, 'm'), `APP_USERNAME${slot}=${username}`);
-            envContent = envContent.replace(new RegExp(`^APP_PASSWORD${slot}=.*$`, 'm'), `APP_PASSWORD${slot}=${password}`);
-            fs.writeFileSync(envPath, envContent);
+            // Hash de la contraseña
+            const salt = await bcrypt.genSalt(10);
+            const hashedPassword = await bcrypt.hash(password, salt);
+
+            // Crear nuevo usuario
+            const newUser = await dataService.createUser({
+                name: name || username,
+                email: email || `${username}@platform.com`,
+                username,
+                password: hashedPassword,
+                role: role, // admin o teacher
+                active: true
+                // platformData se crea automáticamente en dataService.createUser()
+            });
 
             return res.status(201).json({
                 success: true,
-                message: 'Usuario registrado exitosamente'
+                message: 'Usuario registrado exitosamente',
+                user: {
+                    id: newUser._id || newUser.id,
+                    name: newUser.name,
+                    email: newUser.email,
+                    username: newUser.username,
+                    role: newUser.role,
+                    active: newUser.active,
+                    platformData: newUser.platformData,
+                    createdAt: newUser.createdAt,
+                    updatedAt: newUser.updatedAt
+                }
             });
         } catch (error) {
             console.error('Error en registro:', error);
@@ -107,9 +84,11 @@ const authController = {
         }
     },
 
+    // Login para administradores y profesores
     login: async (req, res) => {
         try {
             const { username, password } = req.body;
+            
             if (!username || !password) {
                 return res.status(400).json({
                     success: false,
@@ -117,34 +96,28 @@ const authController = {
                 });
             }
 
-            let user = null;
-            let role = 'user';
-            if (username === process.env.APP_USERNAME && password === process.env.APP_PASSWORD) {
-                user = { username, role: 'admin' };
-                role = 'admin';
-            } else {
-                // Verificar slots de usuarios
-                for (let i = 1; i <= 5; i++) {
-                    if (
-                        username === process.env[`APP_USERNAME${i}`] &&
-                        password === process.env[`APP_PASSWORD${i}`] &&
-                        process.env[`APP_USERNAME${i}`] && 
-                        process.env[`APP_USERNAME${i}`].trim() !== ''
-                    ) {
-                        user = { username, role: 'user' };
-                        break;
-                    }
-                }
-            }
-            if (!user) {
+            // Buscar usuario con contraseña
+            const user = await dataService.findUserByUsernameWithPassword(username);
+            if (!user || !user.active) {
                 return res.status(401).json({
                     success: false,
                     message: 'Credenciales inválidas'
                 });
             }
 
+            // Verificar contraseña
+            const isPasswordValid = await bcrypt.compare(password, user.password);
+            if (!isPasswordValid) {
+                return res.status(401).json({
+                    success: false,
+                    message: 'Credenciales inválidas'
+                });
+            }
+
+            // Generar token JWT
             const token = jwt.sign(
                 {
+                    userId: user._id || user.id.toString(),
                     username: user.username,
                     role: user.role
                 },
@@ -155,10 +128,110 @@ const authController = {
             return res.json({
                 success: true,
                 token,
-                role: user.role
+                user: {
+                    id: user._id || user.id,
+                    name: user.name,
+                    email: user.email,
+                    username: user.username,
+                    role: user.role,
+                    active: user.active,
+                    platformData: user.platformData,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt
+                }
             });
         } catch (error) {
             console.error('Error en login:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error en el servidor'
+            });
+        }
+    },
+
+    // Obtener perfil del usuario actual
+    getProfile: async (req, res) => {
+        try {
+            const user = await dataService.findUserById(req.user.userId);
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            return res.json({
+                success: true,
+                user: {
+                    id: user._id || user.id,
+                    name: user.name,
+                    email: user.email,
+                    username: user.username,
+                    role: user.role,
+                    active: user.active,
+                    platformData: user.platformData,
+                    createdAt: user.createdAt,
+                    updatedAt: user.updatedAt
+                }
+            });
+        } catch (error) {
+            console.error('Error obteniendo perfil:', error);
+            return res.status(500).json({
+                success: false,
+                message: 'Error en el servidor'
+            });
+        }
+    },
+
+    // Actualizar perfil del usuario
+    updateProfile: async (req, res) => {
+        try {
+            const { password, name, email } = req.body;
+            const user = await dataService.findUserById(req.user.userId);
+            
+            if (!user) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            const updateData = {};
+
+            if (name) updateData.name = name;
+            if (email) updateData.email = email;
+
+            if (password) {
+                if (password.length < 6) {
+                    return res.status(400).json({
+                        success: false,
+                        message: 'La contraseña debe tener al menos 6 caracteres'
+                    });
+                }
+                // Hash de la nueva contraseña
+                const salt = await bcrypt.genSalt(10);
+                updateData.password = await bcrypt.hash(password, salt);
+            }
+
+            const updatedUser = await dataService.updateUser(req.user.userId, updateData);
+
+            return res.json({
+                success: true,
+                message: 'Perfil actualizado exitosamente',
+                user: {
+                    id: updatedUser._id || updatedUser.id,
+                    name: updatedUser.name,
+                    email: updatedUser.email,
+                    username: updatedUser.username,
+                    role: updatedUser.role,
+                    active: updatedUser.active,
+                    platformData: updatedUser.platformData,
+                    createdAt: updatedUser.createdAt,
+                    updatedAt: updatedUser.updatedAt
+                }
+            });
+        } catch (error) {
+            console.error('Error actualizando perfil:', error);
             return res.status(500).json({
                 success: false,
                 message: 'Error en el servidor'

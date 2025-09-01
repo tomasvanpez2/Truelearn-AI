@@ -14,7 +14,7 @@ function loadStudents() {
             console.error('Error al cargar students.json:', error);
             return [];
         }
-    }    return [];
+    } return [];
 }
 
 // Función para guardar estudiantes en el archivo JSON
@@ -28,13 +28,13 @@ function saveStudents(students) {
 
 module.exports = {
     // Obtener todos los estudiantes de un curso
-    getStudentsByCourse: function(course) {
+    getStudentsByCourse: function (course) {
         const students = loadStudents();
         return students.filter(s => s.course === course);
     },
 
     // Agregar un nuevo estudiante
-    addStudent: function(studentData) {
+    addStudent: function (studentData) {
         const { name, course } = studentData;
         if (!name || !course) {
             return { success: false, message: 'Datos incompletos' };
@@ -53,7 +53,7 @@ module.exports = {
     },
 
     // Actualizar un estudiante existente
-    updateStudent: function(studentId, updatedData) {
+    updateStudent: function (studentId, updatedData) {
         const students = loadStudents();
         const studentIndex = students.findIndex(s => s.id === studentId);
         if (studentIndex === -1) {
@@ -66,7 +66,7 @@ module.exports = {
     },
 
     // Eliminar un estudiante
-    deleteStudent: function(studentId) {
+    deleteStudent: function (studentId) {
         let students = loadStudents();
         const initialLength = students.length;
         students = students.filter(s => s.id !== studentId);
@@ -77,9 +77,9 @@ module.exports = {
         saveStudents(students);
         return { success: true, message: 'Estudiante eliminado correctamente' };
     },
-    
+
     // Obtener un estudiante por su ID
-    getStudentById: function(studentId) {
+    getStudentById: function (studentId) {
         const students = loadStudents();
         return students.find(s => s.id === studentId) || null;
     }

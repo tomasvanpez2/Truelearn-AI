@@ -5,16 +5,25 @@ const express = require('express');
 const path = require('path');
 const multer = require('multer');
 const cors = require('cors');
+// MongoDB removido - usando solo JSON
 const authRoutes = require('./routes/auth');
 const analysisRoutes = require('./routes/analysis');
 const usersRoutes = require('./routes/users');
-const studentRoutes = require('./routes/students');
+const teacherRoutes = require('./routes/teachers');
+const teacherProfileRoutes = require('./routes/teacher');
+const adminRoutes = require('./routes/admin');
+const studentsRoutes = require('./routes/students');
 const themesRoutes = require('./routes/themes');
 const tokenRoutes = require('./routes/tokens');
+const coursesRoutes = require('./routes/courses');
+const platformRoutes = require('./routes/platform');
 const aiAnalysisRoutes = require('./routes/aiAnalysis');
 
 const app = express();
-const port = process.env.PORT || 3001;
+const port = process.env.PORT || 3000;
+
+// Sistema configurado para usar solo archivos JSON
+console.log('🟢 Sistema configurado para usar archivos JSON como base de datos');
 
 // Configuración de middleware
 app.use(cors());
@@ -49,9 +58,14 @@ const upload = multer({
 app.use('/api/auth', authRoutes);
 app.use('/api/analysis', analysisRoutes);
 app.use('/api/users', usersRoutes);
-app.use('/api/students', studentRoutes);
+app.use('/api/teachers', teacherRoutes);
+app.use('/api/teacher', teacherProfileRoutes);
+app.use('/api/admin', adminRoutes);
+app.use('/api/students', studentsRoutes);
 app.use('/api/themes', themesRoutes);
 app.use('/api/tokens', tokenRoutes);
+app.use('/api/courses', coursesRoutes);
+app.use('/api/platform', platformRoutes);
 app.use('/api/ai-analysis', aiAnalysisRoutes);
 
 // Ruta principal
@@ -62,6 +76,11 @@ app.get('/', (req, res) => {
 // Ruta del dashboard (protegida por verificación de token en el frontend)
 app.get('/dashboard.html', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/dashboard.html'));
+});
+
+// Ruta de gestión de profesores (protegida por verificación de token en el frontend)
+app.get('/teachers-management.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/teachers-management.html'));
 });
 
 // Manejo de errores

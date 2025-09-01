@@ -1,2 +1,0 @@
-[2025-08-27T02:07:08.808Z] | Documento: Análisis de texto - Grado 8º | Tokens de entrada: 2252 | Tokens de salida: 1879 | Total de tokens: 4131 | ---
-[2025-08-29T21:55:27.597Z] | Documento: Análisis de texto - Grado 8º | Tokens de entrada: 1872 | Tokens de salida: 540 | Total de tokens: 2412 | ---

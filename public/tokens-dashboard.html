@@ -198,10 +198,12 @@
     <div class="container">
         <div class="header">
             <h1>Dashboard de Consumo de Tokens</h1>
-            <p>Monitoreo del uso de tokens por estudiante</p>
+            <p>Monitoreo del uso de tokens por estudiante (datos desde archivos de procesos)</p>
         </div>
 
-        <button class="refresh-btn" onclick="loadData()">🔄 Actualizar Datos</button>
+        <div style="margin-bottom: 20px;">
+            <button class="refresh-btn" onclick="loadData()">↻ Actualizar Datos</button>
+        </div>
 
         <div id="error-message" class="error" style="display: none;"></div>
 
@@ -222,7 +224,8 @@
                         <th>Tokens de Entrada</th>
                         <th>Tokens de Salida</th>
                         <th>Solicitudes</th>
-                        <th>Promedio por Solicitud</th>
+                        <th>Último Análisis</th>
+                        <th>Estado</th>
                         <th>Acciones</th>
                     </tr>
                 </thead>
@@ -270,25 +273,29 @@
                 document.getElementById('users-table').style.display = 'none';
                 document.getElementById('error-message').style.display = 'none';
 
-                // Cargar estadísticas del sistema
-                const statsResponse = await fetch('/api/tokens/stats', { headers });
+                // Cargar estadísticas del admin actual
+                const statsResponse = await fetch('/api/platform/stats', { headers });
                 const statsData = await statsResponse.json();
 
                 if (statsData.success) {
-                    displayStats(statsData.data);
+                    displayStats(statsData.stats);
                 }
 
-                // Cargar datos de usuarios
-                const usersResponse = await fetch('/api/tokens/summary/all', { headers });
-                const usersData = await usersResponse.json();
+                // Cargar estudiantes con tokens reales desde archivos
+                const studentsResponse = await fetch('/api/platform/students', { headers });
+                const studentsData = await studentsResponse.json();
 
-                if (usersData.success) {
-                    displayUsers(usersData.data);
+                if (studentsData.success) {
+                    displayStudentsWithTokens(studentsData.students);
                     document.getElementById('loading').style.display = 'none';
                     document.getElementById('users-table').style.display = 'table';
+                    
+                    // Verificar alertas de tokens agotados
+                    checkTokenAlerts(studentsData.students);
                 } else {
-                    throw new Error(usersData.message);
+                    throw new Error('No se pudieron cargar los estudiantes: ' + studentsData.message);
                 }
+
             } catch (error) {
                 console.error('Error cargando datos:', error);
                 document.getElementById('error-message').textContent = 'Error cargando datos: ' + error.message;
@@ -299,41 +306,106 @@
 
         function displayStats(stats) {
             const statsSection = document.getElementById('stats-section');
+            
+            // Verificar si stats existe y tiene la estructura esperada
+            if (!stats) {
+                statsSection.innerHTML = `
+                    <div class="stat-card">
+                        <div class="stat-number">-</div>
+                        <div class="stat-label">Error cargando estadísticas</div>
+                    </div>
+                `;
+                return;
+            }
+
+            // Adaptar a la estructura actual de datos
+            const tokensUsed = stats.tokens?.used || 0;
+            const tokensLimit = stats.tokens?.limit || 0;
+            const studentsUsed = stats.tokens?.studentsUsed || 0;
+            const teachersTotal = stats.teachers?.total || 0;
+            const studentsTotal = stats.students?.total || 0;
+            const studentsExhausted = stats.students?.withTokensExhausted || 0;
+            const coursesTotal = stats.courses?.total || 0;
+            const themesTotal = stats.themes?.total || 0;
+
             statsSection.innerHTML = `
                 <div class="stat-card">
-                    <div class="stat-number">${stats.totalUsers}</div>
-                    <div class="stat-label">Usuarios Totales</div>
+                    <div class="stat-number">${studentsTotal}</div>
+                    <div class="stat-label">Estudiantes</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">${stats.totalSystemTokens.toLocaleString()}</div>
-                    <div class="stat-label">Tokens Totales del Sistema</div>
+                    <div class="stat-number">${tokensUsed.toLocaleString()}/${tokensLimit.toLocaleString()}</div>
+                    <div class="stat-label">Tokens Totales Usados/Límite</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">${stats.totalSystemRequests}</div>
-                    <div class="stat-label">Solicitudes Totales</div>
+                    <div class="stat-number">${studentsUsed.toLocaleString()}</div>
+                    <div class="stat-label">Tokens de Estudiantes</div>
                 </div>
                 <div class="stat-card">
-                    <div class="stat-number">${stats.averageTokensPerUser.toLocaleString()}</div>
-                    <div class="stat-label">Promedio de Tokens por Usuario</div>
+                    <div class="stat-number">${studentsExhausted}</div>
+                    <div class="stat-label">Estudiantes sin Tokens</div>
+                </div>
+                <div class="stat-card">
+                    <div class="stat-number">${teachersTotal}</div>
+                    <div class="stat-label">Profesores</div>
                 </div>
             `;
         }
 
-        function displayUsers(users) {
+        function displayStudentsWithTokens(students) {
             const tbody = document.getElementById('users-tbody');
             tbody.innerHTML = '';
 
-            users.forEach(user => {
+            if (!students || students.length === 0) {
+                tbody.innerHTML = '<tr><td colspan="8" style="text-align: center;">No hay estudiantes registrados</td></tr>';
+                return;
+            }
+
+            students.forEach(student => {
+                const tokensUsed = student.tokens?.used || 0;
+                const tokensLimit = student.tokens?.limit || 1000;
+                const entries = student.tokens?.entries || [];
+                const requestCount = entries.length;
+                
+                // Calcular tokens de entrada y salida
+                let inputTokens = 0;
+                let outputTokens = 0;
+                let lastAnalysis = 'Nunca';
+                
+                entries.forEach(entry => {
+                    inputTokens += entry.inputTokens || 0;
+                    outputTokens += entry.outputTokens || 0;
+                });
+                
+                if (entries.length > 0) {
+                    const lastEntry = entries[entries.length - 1];
+                    lastAnalysis = new Date(lastEntry.date).toLocaleDateString('es-ES');
+                }
+                
+                // Determinar estado
+                const percentage = (tokensUsed / tokensLimit) * 100;
+                let status = 'Activo';
+                let statusClass = 'btn-success';
+                
+                if (tokensUsed >= tokensLimit) {
+                    status = 'Agotado';
+                    statusClass = 'btn-danger';
+                } else if (percentage > 80) {
+                    status = 'Crítico';
+                    statusClass = 'btn-warning';
+                }
+                
                 const row = document.createElement('tr');
                 row.innerHTML = `
-                    <td><strong>${user.studentName}</strong></td>
-                    <td class="token-count">${user.totalTokens.toLocaleString()}</td>
-                    <td>${user.totalPromptTokens.toLocaleString()}</td>
-                    <td>${user.totalCompletionTokens.toLocaleString()}</td>
-                    <td>${user.requestCount}</td>
-                    <td>${user.averageTokensPerRequest.toLocaleString()}</td>
+                    <td><strong>${student.name}</strong><br><small>${student.course || 'Sin curso'}</small></td>
+                    <td class="token-count">${tokensUsed.toLocaleString()}</td>
+                    <td>${inputTokens.toLocaleString()}</td>
+                    <td>${outputTokens.toLocaleString()}</td>
+                    <td>${requestCount}</td>
+                    <td>${lastAnalysis}</td>
+                    <td><span class="view-log-btn ${statusClass}" style="padding: 4px 8px; font-size: 0.8em;">${status}</span></td>
                     <td>
-                        <button class="view-log-btn" onclick="viewUserLog('${user.studentName}')">
+                        <button class="view-log-btn" onclick="viewStudentLog('${student.name}')">
                             Ver Log
                         </button>
                     </td>
@@ -342,21 +414,64 @@
             });
         }
 
-        async function viewUserLog(studentName) {
-            try {
-                const response = await fetch(`/api/tokens/log/${encodeURIComponent(studentName)}`, { headers });
-                const data = await response.json();
+        function checkTokenAlerts(students) {
+            const exhaustedStudents = students.filter(s => s.tokens?.used >= (s.tokens?.limit || 1000));
+            
+            if (exhaustedStudents.length > 0) {
+                const names = exhaustedStudents.map(s => s.name).join(', ');
+                const alertDiv = document.createElement('div');
+                alertDiv.className = 'error';
+                alertDiv.innerHTML = `<strong>⚠️ ALERTA:</strong> Los siguientes estudiantes han agotado sus tokens: ${names}`;
+                
+                const container = document.querySelector('.container');
+                const header = container.querySelector('.header');
+                container.insertBefore(alertDiv, header.nextSibling);
+                
+                // Auto-remover después de 10 segundos
+                setTimeout(() => {
+                    if (alertDiv.parentNode) {
+                        alertDiv.remove();
+                    }
+                }, 10000);
+            }
+        }
 
-                if (data.success) {
-                    document.getElementById('modal-title').textContent = `Log de Tokens - ${studentName}`;
-                    document.getElementById('log-content').textContent = data.data.logContent;
-                    document.getElementById('logModal').style.display = 'block';
+        async function viewStudentLog(studentName) {
+            try {
+                // Buscar el estudiante en los datos cargados para obtener sus entradas
+                const studentsResponse = await fetch('/api/platform/students', { headers });
+                const studentsData = await studentsResponse.json();
+                
+                if (studentsData.success) {
+                    const student = studentsData.students.find(s => s.name === studentName);
+                    
+                    if (student && student.tokens && student.tokens.entries) {
+                        let logContent = `Log de Tokens - ${studentName}\n`;
+                        logContent += `Total de tokens usados: ${student.tokens.used}\n`;
+                        logContent += `Límite: ${student.tokens.limit || 1000}\n`;
+                        logContent += `Número de análisis: ${student.tokens.entries.length}\n\n`;
+                        logContent += '--- Historial de Análisis ---\n\n';
+                        
+                        student.tokens.entries.forEach((entry, index) => {
+                            logContent += `${index + 1}. ${entry.date}\n`;
+                            logContent += `   Documento: ${entry.document}\n`;
+                            logContent += `   Tokens de entrada: ${entry.inputTokens}\n`;
+                            logContent += `   Tokens de salida: ${entry.outputTokens}\n`;
+                            logContent += `   Total: ${entry.totalTokens}\n\n`;
+                        });
+                        
+                        document.getElementById('modal-title').textContent = `Log de Tokens - ${studentName}`;
+                        document.getElementById('log-content').textContent = logContent;
+                        document.getElementById('logModal').style.display = 'block';
+                    } else {
+                        alert(`No se encontraron datos de tokens para ${studentName}`);
+                    }
                 } else {
-                    alert('Error cargando el log: ' + data.message);
+                    alert('Error cargando datos del estudiante');
                 }
             } catch (error) {
                 console.error('Error cargando log:', error);
-                alert('Error cargando el log del usuario');
+                alert('Error cargando el log del estudiante');
             }
         }
 
@@ -373,6 +488,8 @@
                 modal.style.display = 'none';
             }
         }
+
+
 
         // Cargar datos al iniciar
         loadData();

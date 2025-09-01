@@ -27,7 +27,47 @@
                 </div>
                 <button type="submit" class="login-button">Iniciar Sesión</button>
             </form>
+            
+            <div class="register-section">
+                <p>¿No tienes cuenta?</p>
+                <button type="button" id="registerBtn" class="register-button">Registrarse como Admin</button>
+            </div>
+            
             <div id="error-message" class="error-message"></div>
+            <div id="success-message" class="success-message"></div>
+        </div>
+    </div>
+
+    <!-- Modal de Registro -->
+    <div id="registerModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>Registro de Administrador</h2>
+            <form id="registerForm">
+                <div class="form-group">
+                    <label for="regName">Nombre completo:</label>
+                    <input type="text" id="regName" name="name" required>
+                </div>
+                <div class="form-group">
+                    <label for="regEmail">Email:</label>
+                    <input type="email" id="regEmail" name="email" required>
+                </div>
+                <div class="form-group">
+                    <label for="regUsername">Usuario:</label>
+                    <input type="text" id="regUsername" name="username" required>
+                </div>
+                <div class="form-group">
+                    <label for="regPassword">Contraseña:</label>
+                    <input type="password" id="regPassword" name="password" required minlength="6">
+                </div>
+                <div class="form-group">
+                    <label for="regConfirmPassword">Confirmar contraseña:</label>
+                    <input type="password" id="regConfirmPassword" name="confirmPassword" required minlength="6">
+                </div>
+                <button type="submit" class="login-button">Registrarse</button>
+            </form>
+            <div id="register-error-message" class="error-message"></div>
+            <div id="register-success-message" class="success-message"></div>
         </div>
     </div>
     <script src="/js/login.js"></script>

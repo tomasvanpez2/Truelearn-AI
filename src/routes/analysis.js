@@ -4,6 +4,7 @@ const multer = require('multer');
 const path = require('path');
 const { MIN_TEXT_LENGTH, MAX_TEXT_LENGTH } = process.env;
 const { verifyToken } = require('../middleware/authMiddleware');
+const { checkTokensBeforeAnalysis } = require('../middleware/tokenMiddleware');
 
 // Configuración de multer para la subida de archivos
 const storage = multer.diskStorage({
@@ -34,7 +35,7 @@ const upload = multer({
 const analysisController = require('../controllers/analysisController');
 
 // Ruta para subir y analizar documento
-router.post('/upload', verifyToken, upload.single('document'), analysisController.analyzeDocument);
+router.post('/upload', verifyToken, checkTokensBeforeAnalysis, upload.single('document'), analysisController.analyzeDocument);
 
 // Ruta para obtener resultados del análisis
 router.get('/results/:fileId', verifyToken, analysisController.getAnalysisResults);

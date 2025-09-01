@@ -188,17 +188,17 @@ async function main() {
         // Generar reporte diario
         try {
             const reportPath = await generator.generateDailyReport();
-            console.log(`✅ Reporte diario generado exitosamente: ${reportPath}`);
+            console.log(`✓ Reporte diario generado exitosamente: ${reportPath}`);
         } catch (error) {
-            console.error('❌ Error generando reporte diario:', error.message);
+            console.error('✗ Error generando reporte diario:', error.message);
         }
     } else if (args[0] === '--user' && args[1]) {
         // Generar reporte individual
         try {
             const reportPath = await generator.generateUserReport(args[1]);
-            console.log(`✅ Reporte individual generado exitosamente: ${reportPath}`);
+            console.log(`✓ Reporte individual generado exitosamente: ${reportPath}`);
         } catch (error) {
-            console.error('❌ Error generando reporte individual:', error.message);
+            console.error('✗ Error generando reporte individual:', error.message);
         }
     } else {
         console.log('Uso:');

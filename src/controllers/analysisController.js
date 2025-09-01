@@ -2,6 +2,7 @@ const path = require('path');
 const { MIN_TEXT_LENGTH, MAX_TEXT_LENGTH } = process.env;
 const apiConfig = require('../config/apiConfig');
 const detectionService = require('../services/detectionService');
+const dataService = require('../services/dataService');
 
 const analysisController = {
     analyzeDocument: async (req, res) => {
@@ -11,6 +12,39 @@ const analysisController = {
                     success: false,
                     message: 'No se ha proporcionado ningún archivo'
                 });
+            }
+
+            // Verificar tokens antes del análisis
+            let adminId = null;
+            
+            // Si el usuario está autenticado, obtener su admin
+            if (req.user) {
+                if (req.user.role === 'admin') {
+                    adminId = req.user.userId;
+                } else if (req.user.role === 'teacher') {
+                    // Buscar el admin del profesor
+                    const teacher = await dataService.findUserById(req.user.userId);
+                    adminId = teacher?.adminId;
+                }
+            }
+
+            // Si tenemos adminId, verificar límite de tokens
+            if (adminId) {
+                const tokenCheck = await dataService.canAdminAllowTokenUsage(adminId, 2000); // Estimado de tokens por análisis
+                
+                if (!tokenCheck.allowed) {
+                    return res.status(403).json({
+                        success: false,
+                        message: '❌ No tienes suficientes tokens para realizar este análisis',
+                        tokenExhausted: true,
+                        details: {
+                            tokensUsados: tokenCheck.currentUsed,
+                            limite: tokenCheck.limit,
+                            tokensRestantes: tokenCheck.remaining,
+                            razon: tokenCheck.reason
+                        }
+                    });
+                }
             }
 
             const fileInfo = {
@@ -28,17 +62,28 @@ const analysisController = {
                 totalHours: req.body.totalHours || '',
                 topics: req.body.topics ? JSON.parse(req.body.topics) : [],
                 additionalContext: req.body.context || '',
-                documentName: req.file.originalname || req.file.filename
+                documentName: req.file.originalname || req.file.filename,
+                adminId: adminId // Pasar adminId al contexto
             };
             
             // Analizar el archivo utilizando el servicio de detección
             const analysisResult = await detectionService.analyzeFile(fileInfo.path, context);
             
-            // Eliminar la información de tokens antes de enviarla al frontend
-            if (analysisResult && analysisResult.analysis && analysisResult.analysis.usage) {
-                // Guardar la información de tokens en una variable temporal por si se necesita para depuración
+            // Actualizar tokens del admin después del análisis exitoso
+            if (analysisResult && analysisResult.analysis && analysisResult.analysis.usage && adminId) {
                 const tokenInfo = analysisResult.analysis.usage;
-                console.log('Información de tokens registrada:', tokenInfo);
+                const totalTokensUsed = (tokenInfo.prompt_tokens || 0) + (tokenInfo.completion_tokens || 0);
+                
+                // Actualizar tokens del admin
+                const currentTokens = await dataService.getAdminTokensWithAccumulatedUsage(adminId);
+                if (currentTokens) {
+                    await dataService.updateTokens(adminId, {
+                        used: currentTokens.adminDirectUsage + totalTokensUsed,
+                        limit: currentTokens.limit
+                    });
+                }
+                
+                console.log(`Tokens actualizados para admin ${adminId}: +${totalTokensUsed} tokens`);
                 
                 // Eliminar la información de tokens del resultado que se envía al frontend
                 delete analysisResult.analysis.usage;

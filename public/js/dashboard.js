@@ -21,7 +21,7 @@ document.addEventListener('DOMContentLoaded', function() {
         }
     }
     // Verificar si el usuario está autenticado
-    const authToken = localStorage.getItem('token');
+    const authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
     const userRole = localStorage.getItem('userRole');
     const selectedCourseName = localStorage.getItem('selectedCourseName');
     const selectedStudentName = localStorage.getItem('selectedStudentName');
@@ -32,6 +32,7 @@ document.addEventListener('DOMContentLoaded', function() {
     if (!authToken || !isValidToken(authToken)) {
         // Limpiar el token por seguridad
         localStorage.removeItem('authToken');
+        localStorage.removeItem('token');
         // Redirigir al login
         window.location.href = '/index.html';
         return;
@@ -91,6 +92,7 @@ document.addEventListener('DOMContentLoaded', function() {
         if (userRole === 'admin') {
             adminSection.style.display = 'block';
             initializeAdminInterface();
+            loadAdminStats();
         } else {
             adminSection.style.display = 'none';
         }
@@ -102,6 +104,7 @@ document.addEventListener('DOMContentLoaded', function() {
         logoutButton.addEventListener('click', function() {
             // Eliminar datos de autenticación
             localStorage.removeItem('token');
+            localStorage.removeItem('authToken');
             localStorage.removeItem('userRole');
             localStorage.removeItem('username');
             localStorage.removeItem('selectedCourse');
@@ -140,19 +143,42 @@ document.addEventListener('DOMContentLoaded', function() {
         return topicItem;
     }
 
-    // Cargar temas del curso seleccionado
+    // Cargar temas del admin actual
     function loadCourseTopics() {
-        const courseId = localStorage.getItem('selectedCourse');
-        const subjectId = localStorage.getItem('selectedSubject');
-        if (!courseId || !subjectId) return;
-        fetch(`/api/themes/${courseId}/${subjectId}`)
-            .then(res => res.json())
-            .then(data => {
+        const authToken = localStorage.getItem('authToken') || localStorage.getItem('token');
+        if (!authToken) return;
+        
+        fetch('/api/themes/', {
+            headers: {
+                'Authorization': `Bearer ${authToken}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && Array.isArray(data.themes)) {
                 topicsContainer.innerHTML = '';
-                (Array.isArray(data) ? data : []).forEach(topic => {
-                    topicsContainer.appendChild(createTopicInput(topic));
-                });
-            });
+                // Si hay temas guardados, mostrarlos
+                if (data.themes.length > 0) {
+                    data.themes.forEach(theme => {
+                        topicsContainer.appendChild(createTopicInput(theme.name));
+                    });
+                } else {
+                    // Si no hay temas, mostrar un input vacío
+                    topicsContainer.appendChild(createTopicInput(''));
+                }
+            } else {
+                // Si hay error o no hay temas, mostrar un input vacío
+                topicsContainer.innerHTML = '';
+                topicsContainer.appendChild(createTopicInput(''));
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando temas:', error);
+            // En caso de error, mostrar un input vacío
+            topicsContainer.innerHTML = '';
+            topicsContainer.appendChild(createTopicInput(''));
+        });
     }
 
     if (addTopicBtn && topicsContainer) {
@@ -208,6 +234,12 @@ document.addEventListener('DOMContentLoaded', function() {
         const userModal = document.getElementById('user-modal');
         const userForm = document.getElementById('user-form');
         const usersTableBody = document.getElementById('users-table-body');
+
+        // Solo inicializar si los elementos existen
+        if (!addUserBtn || !userModal || !userForm || !usersTableBody) {
+            console.log('Elementos de gestión de usuarios no encontrados, saltando inicialización');
+            return;
+        }
 
         // Cargar lista de usuarios
         loadUsers();
@@ -280,14 +312,28 @@ document.addEventListener('DOMContentLoaded', function() {
         const usersTableBody = document.getElementById('users-table-body');
         const addUserBtn = document.getElementById('add-user-btn');
 
+        // Verificar si los elementos existen
+        if (!usersTableBody || !addUserBtn) {
+            console.log('Elementos de tabla de usuarios no encontrados');
+            return;
+        }
+
         fetch('/api/users', {
             headers: {
                 'Authorization': `Bearer ${authToken}`
             }
         })
-        .then(response => response.json())
+        .then(response => {
+            if (!response.ok) {
+                throw new Error(`HTTP error! status: ${response.status}`);
+            }
+            return response.json();
+        })
         .then(data => {
-            users = data; // Asignar los datos a la variable users
+            if (data.success === false) {
+                throw new Error(data.message || 'Error en la respuesta del servidor');
+            }
+            users = data.users || data; // Manejar tanto el formato nuevo como el anterior
             usersTableBody.innerHTML = '';
             users.forEach(user => {
                 const row = document.createElement('tr');
@@ -313,8 +359,8 @@ document.addEventListener('DOMContentLoaded', function() {
             }
         })
         .catch(error => {
-            console.error('Error:', error);
-            alert('Error al cargar usuarios');
+            console.error('Error cargando usuarios:', error);
+            usersTableBody.innerHTML = '<tr><td colspan="4">Error al cargar usuarios. Verifique la consola para más detalles.</td></tr>';
         });
     }
 
@@ -364,6 +410,68 @@ document.addEventListener('DOMContentLoaded', function() {
 
     function closeUserModal() {
         document.getElementById('user-modal').style.display = 'none';
+    }
+
+    // Cargar estadísticas del admin
+    async function loadAdminStats() {
+        try {
+            const response = await fetch('/api/platform/stats', {
+                headers: {
+                    'Authorization': `Bearer ${authToken}`,
+                    'Content-Type': 'application/json'
+                }
+            });
+            
+            if (response.ok) {
+                const data = await response.json();
+                displayAdminStats(data.stats);
+            } else {
+                console.error('Error cargando estadísticas');
+                displayAdminStats(null);
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            displayAdminStats(null);
+        }
+    }
+
+    // Mostrar estadísticas del admin
+    function displayAdminStats(stats) {
+        const statsContent = document.getElementById('admin-stats-content');
+        
+        if (!stats) {
+            statsContent.innerHTML = '<p>Error cargando estadísticas</p>';
+            return;
+        }
+        
+        statsContent.innerHTML = `
+            <div class="stats-grid">
+                <div class="stat-item">
+                    <div class="stat-number">${stats.teachers.total}</div>
+                    <div class="stat-label">Profesores Total</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.teachers.active}</div>
+                    <div class="stat-label">Profesores Activos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.courses.total}</div>
+                    <div class="stat-label">Cursos</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.themes.total}</div>
+                    <div class="stat-label">Temas</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.tokens.used}/${stats.tokens.limit}</div>
+                    <div class="stat-label">Tokens Usados</div>
+                </div>
+                <div class="stat-item">
+                    <div class="stat-number">${stats.requests.count}/${stats.requests.limit}</div>
+                    <div class="stat-label">Requests</div>
+                </div>
+            </div>
+        `;
     }
 
     // Exponer funciones necesarias globalmente

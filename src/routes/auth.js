@@ -1,16 +1,18 @@
 const express = require('express');
 const router = express.Router();
-const jwt = require('jsonwebtoken');
-const { JWT_SECRET, JWT_EXPIRATION } = process.env;
-const userConfig = require('../../users.config');
 const authController = require('../controllers/authController');
+const { verifyToken } = require('../middleware/authMiddleware');
 
-router.post('/signup', authController.signup);
-
-// Ruta para registro de usuarios
+// Ruta para registro de nuevos administradores
 router.post('/register', authController.register);
 
 // Ruta para inicio de sesión
 router.post('/login', authController.login);
+
+// Ruta para obtener perfil del usuario actual
+router.get('/profile', verifyToken, authController.getProfile);
+
+// Ruta para actualizar perfil del usuario
+router.put('/profile', verifyToken, authController.updateProfile);
 
 module.exports = router;

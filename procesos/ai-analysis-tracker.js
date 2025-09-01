@@ -42,7 +42,7 @@ class AIAnalysisTracker {
             // Guardar el archivo actualizado
             await fs.writeFile(this.analysisFile, JSON.stringify(analysisData, null, 2));
             
-            console.log(`✅ Análisis guardado para ${studentName}: ${aiPercentage}% IA`);
+            console.log(`✓ Análisis guardado para ${studentName}: ${aiPercentage}% IA`);
             return true;
         } catch (error) {
             console.error('Error guardando análisis de IA:', error);

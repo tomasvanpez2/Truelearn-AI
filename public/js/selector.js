@@ -27,7 +27,7 @@ document.addEventListener('DOMContentLoaded', () => {
     let topics = [];
     let selectedTopicIndex = null;
 
-    const token = localStorage.getItem('token');
+    const token = localStorage.getItem('authToken');
     const userRole = localStorage.getItem('userRole');
 
     if (!token) {
@@ -95,6 +95,7 @@ document.addEventListener('DOMContentLoaded', () => {
             topicManagementSection.style.display = 'block';
             courseHoursGroup.style.display = 'block';
             studentManagementSection.style.display = 'none';
+            
             // Restaurar el valor guardado para la materia y grado seleccionados
             const key = `courseHours_${courseSelect.value}_${subjectSelect.value}`;
             const savedHours = localStorage.getItem(key);
@@ -103,12 +104,40 @@ document.addEventListener('DOMContentLoaded', () => {
             } else {
                 courseHoursInput.value = '';
             }
+            
+            // Cargar temas existentes del backend
+            loadExistingThemes();
         } else {
             topicManagementSection.style.display = 'none';
             courseHoursGroup.style.display = 'none';
             studentManagementSection.style.display = 'none';
         }
     });
+
+    // Función para cargar temas existentes
+    function loadExistingThemes() {
+        fetch('/api/themes/', {
+            headers: { 
+                'Authorization': `Bearer ${token}`,
+                'Content-Type': 'application/json'
+            }
+        })
+        .then(res => res.json())
+        .then(data => {
+            if (data.success && Array.isArray(data.themes)) {
+                topics = data.themes.map(theme => theme.name);
+                renderTopics();
+            } else {
+                topics = [];
+                renderTopics();
+            }
+        })
+        .catch(error => {
+            console.error('Error cargando temas:', error);
+            topics = [];
+            renderTopics();
+        });
+    }
 
     // Renderizar la lista de temas
     function renderTopics() {
@@ -130,44 +159,40 @@ document.addEventListener('DOMContentLoaded', () => {
     addTopicBtn.addEventListener('click', () => {
         const tema = prompt('Ingrese el nombre del tema trabajado:');
         if (tema && tema.trim()) {
-            fetch(`/api/themes/${courseSelect.value}/${subjectSelect.value}`, {
+            fetch('/api/themes/', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ topic: tema.trim() })
+                headers: { 
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${token}`
+                },
+                body: JSON.stringify({ 
+                    name: tema.trim(),
+                    description: `Tema para ${courseSelect.value} - ${subjectSelect.value}`
+                })
             })
             .then(res => res.json())
             .then(data => {
                 if (data.success) {
-                    topics = data.topics;
+                    topics.push(tema.trim());
                     renderTopics();
                 } else {
-                    alert('No se pudo agregar el tema.');
+                    alert('No se pudo agregar el tema: ' + (data.message || 'Error desconocido'));
                 }
             })
-            .catch(() => alert('Error al agregar tema.'));
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Error al agregar tema.');
+            });
         }
     });
 
-    // Eliminar tema seleccionado (persistente)
+    // Eliminar tema seleccionado (local - no persistente por ahora)
     deleteTopicBtn.addEventListener('click', () => {
         if (selectedTopicIndex !== null && topics[selectedTopicIndex] !== undefined) {
             if (confirm(`¿Eliminar el tema "${topics[selectedTopicIndex]}"?`)) {
-                fetch(`/api/themes/${courseSelect.value}/${subjectSelect.value}`, {
-                    method: 'DELETE',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ topic: topics[selectedTopicIndex] })
-                })
-                .then(res => res.json())
-                .then(data => {
-                    if (data.success) {
-                        topics = data.topics;
-                        selectedTopicIndex = null;
-                        renderTopics();
-                    } else {
-                        alert('No se pudo eliminar el tema.');
-                    }
-                })
-                .catch(() => alert('Error al eliminar tema.'));
+                topics.splice(selectedTopicIndex, 1);
+                selectedTopicIndex = null;
+                renderTopics();
             }
         } else {
             alert('Seleccione un tema para eliminar.');

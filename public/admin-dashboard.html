@@ -194,7 +194,7 @@
 <body>
     <div class="container">
         <div class="header">
-            <h1>🛠️ Panel de Administración</h1>
+            <h1>Panel de Administración</h1>
             <p>Gestión y monitoreo del sistema de detección de IA</p>
         </div>
 
@@ -248,8 +248,10 @@
                     </div>
                 </a>
 
+
+
                 <a href="/selector.html" class="dashboard-card">
-                    <span class="dashboard-icon users-icon">👥</span>
+                    <span class="dashboard-icon users-icon">👤</span>
                     <div class="dashboard-title">Gestión de Usuarios</div>
                     <div class="dashboard-description">
                         Administra estudiantes, cursos y configuraciones del sistema
@@ -267,7 +269,7 @@
                 </a>
 
                 <div class="dashboard-card" onclick="showSystemInfo()">
-                    <span class="dashboard-icon settings-icon">⚙️</span>
+                    <span class="dashboard-icon settings-icon">⚙</span>
                     <div class="dashboard-title">Información del Sistema</div>
                     <div class="dashboard-description">
                         Información general del sistema y configuraciones
@@ -287,7 +289,7 @@
         </div>
 
         <div class="logout-section">
-            <button class="logout-btn" onclick="logout()">🚪 Cerrar Sesión</button>
+            <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
         </div>
     </div>
 
@@ -339,6 +341,19 @@
                     }
                 } catch (error) {
                     console.log('No hay datos de tokens disponibles');
+                }
+
+                // Cargar estadísticas de estudiantes
+                try {
+                    const studentsResponse = await fetch('/api/platform/stats', { headers });
+                    const studentsData = await studentsResponse.json();
+                    if (studentsData.success) {
+                        document.getElementById('students-total').textContent = studentsData.stats.students?.total || 0;
+                        document.getElementById('students-exhausted').textContent = studentsData.stats.students?.withTokensExhausted || 0;
+                        document.getElementById('rankings-total').textContent = studentsData.stats.rankings?.total || 0;
+                    }
+                } catch (error) {
+                    console.log('No hay datos de estudiantes disponibles');
                 }
 
                 document.getElementById('loading').style.display = 'none';
