@@ -2,8 +2,8 @@
 module.exports = {
     // Configuración de la API
     api: {
-        baseUrl: 'https://openrouter.ai/api/v1',
-        model: 'qwen/qwen3-235b-a22b:free',
+        baseUrl: 'https://api.openai.com/v1',
+        model: 'gpt-5-nano-2025-08-07',
         maxTokens: 10000,
         temperature: 0.5,
         apiKey: process.env.OPENAI_API_KEY
