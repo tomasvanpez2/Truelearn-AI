@@ -287,7 +287,23 @@ const platformController = {
     // TEMAS
     getThemes: async (req, res) => {
         try {
-            const themes = await dataService.getThemes(req.user.userId);
+            // Obtener el usuario actual
+            const currentUser = await dataService.findUserById(req.user.userId);
+            if (!currentUser) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            // Determinar de qué admin obtener los temas
+            let targetAdminId = req.user.userId;
+            if (currentUser.role === 'teacher') {
+                // Si es profesor, obtener temas del admin que lo creó
+                targetAdminId = currentUser.adminId;
+            }
+
+            const themes = await dataService.getThemes(targetAdminId);
             return res.json({
                 success: true,
                 themes: themes
@@ -312,7 +328,23 @@ const platformController = {
                 });
             }
 
-            const newTheme = await dataService.addTheme(req.user.userId, {
+            // Obtener el usuario actual
+            const currentUser = await dataService.findUserById(req.user.userId);
+            if (!currentUser) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            // Determinar a qué admin agregar el tema
+            let targetAdminId = req.user.userId;
+            if (currentUser.role === 'teacher') {
+                // Si es profesor, agregar el tema al admin que lo creó
+                targetAdminId = currentUser.adminId;
+            }
+
+            const newTheme = await dataService.addTheme(targetAdminId, {
                 name,
                 description: description || ''
             });
@@ -320,7 +352,7 @@ const platformController = {
             if (!newTheme) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Usuario no encontrado'
+                    message: 'Admin no encontrado'
                 });
             }
 
@@ -588,7 +620,23 @@ const platformController = {
     // GESTIÓN DE ESTUDIANTES
     getStudents: async (req, res) => {
         try {
-            const students = await dataService.getStudents(req.user.userId);
+            // Obtener el usuario actual
+            const currentUser = await dataService.findUserById(req.user.userId);
+            if (!currentUser) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            // Determinar de qué admin obtener los estudiantes
+            let targetAdminId = req.user.userId;
+            if (currentUser.role === 'teacher') {
+                // Si es profesor, obtener estudiantes del admin que lo creó
+                targetAdminId = currentUser.adminId;
+            }
+
+            const students = await dataService.getStudents(targetAdminId);
             return res.json({
                 success: true,
                 students
@@ -613,7 +661,23 @@ const platformController = {
                 });
             }
 
-            const newStudent = await dataService.addStudent(req.user.userId, {
+            // Obtener el usuario actual
+            const currentUser = await dataService.findUserById(req.user.userId);
+            if (!currentUser) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
+                });
+            }
+
+            // Determinar a qué admin agregar el estudiante
+            let targetAdminId = req.user.userId;
+            if (currentUser.role === 'teacher') {
+                // Si es profesor, agregar el estudiante al admin que lo creó
+                targetAdminId = currentUser.adminId;
+            }
+
+            const newStudent = await dataService.addStudent(targetAdminId, {
                 name,
                 course: course || '',
                 tokenLimit: tokenLimit || 1000
@@ -622,7 +686,7 @@ const platformController = {
             if (!newStudent) {
                 return res.status(404).json({
                     success: false,
-                    message: 'Usuario no encontrado'
+                    message: 'Admin no encontrado'
                 });
             }
 

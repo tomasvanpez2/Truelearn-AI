@@ -16,6 +16,40 @@ class DataService {
         }
     }
 
+    // Función auxiliar para asegurar la estructura correcta de platformData
+    ensurePlatformDataStructure(user) {
+        if (!user.platformData) {
+            user.platformData = {};
+        }
+
+        // Estructura base para todos los roles
+        if (!user.platformData.tokens) {
+            user.platformData.tokens = { used: 0, limit: 0 };
+        }
+
+        // Estructura específica según el rol
+        if (user.role === 'admin') {
+            if (!user.platformData.students) user.platformData.students = [];
+            if (!user.platformData.courses) user.platformData.courses = [];
+            if (!user.platformData.themes) user.platformData.themes = [];
+            if (!user.platformData.rankings) user.platformData.rankings = [];
+            
+            // Los admins tienen límite de tokens
+            if (user.platformData.tokens.limit === 0) {
+                user.platformData.tokens.limit = 5000;
+            }
+        } else if (user.role === 'teacher') {
+            if (!user.platformData.themes) user.platformData.themes = [];
+            // Los profesores no tienen límite propio de tokens
+            user.platformData.tokens.limit = 0;
+        } else if (user.role === 'student') {
+            // Los estudiantes no tienen límite de tokens
+            user.platformData.tokens.limit = 0;
+        }
+
+        return user;
+    }
+
     initializeDefaultData() {
         if (!fs.existsSync(this.usersFile)) {
             const defaultUsers = [
@@ -39,6 +73,33 @@ class DataService {
                 }
             ];
             this.saveUsers(defaultUsers);
+        } else {
+            // Migrar datos existentes para asegurar estructura correcta
+            this.migrateExistingData();
+        }
+    }
+
+    // Migración para corregir datos existentes
+    migrateExistingData() {
+        try {
+            const users = this.loadUsers();
+            let needsSave = false;
+
+            users.forEach((user, index) => {
+                const originalUser = JSON.stringify(user);
+                users[index] = this.ensurePlatformDataStructure(user);
+                
+                if (JSON.stringify(users[index]) !== originalUser) {
+                    needsSave = true;
+                }
+            });
+
+            if (needsSave) {
+                this.saveUsers(users);
+                console.log('Datos de usuarios migrados correctamente');
+            }
+        } catch (error) {
+            console.error('Error durante la migración de datos:', error);
         }
     }
 
@@ -162,15 +223,8 @@ class DataService {
             createdAt: new Date().toISOString()
         };
 
-        if (!users[userIndex].platformData) {
-            users[userIndex].platformData = {
-                tokens: { used: 0, limit: 5000 },
-                students: [],
-                courses: [],
-                themes: [],
-                rankings: []
-            };
-        }
+        // Asegurar que la estructura de platformData esté completa
+        users[userIndex] = this.ensurePlatformDataStructure(users[userIndex]);
 
         users[userIndex].platformData.courses.push(course);
         users[userIndex].updatedAt = new Date().toISOString();
@@ -185,9 +239,9 @@ class DataService {
     }
 
     // Métodos para temas
-    addTheme(adminId, themeData) {
+    addTheme(userId, themeData) {
         const users = this.loadUsers();
-        const userIndex = users.findIndex(u => u.id === adminId);
+        const userIndex = users.findIndex(u => u.id === userId);
         if (userIndex === -1) return null;
 
         const theme = {
@@ -197,26 +251,24 @@ class DataService {
             createdAt: new Date().toISOString()
         };
 
-        if (!users[userIndex].platformData) {
-            users[userIndex].platformData = {
-                tokens: { used: 0, limit: 5000 },
-                students: [],
-                courses: [],
-                themes: [],
-                rankings: []
-            };
-        }
+        // Asegurar que la estructura de platformData esté completa
+        users[userIndex] = this.ensurePlatformDataStructure(users[userIndex]);
 
+        // Agregar el tema al array correspondiente
         users[userIndex].platformData.themes.push(theme);
         users[userIndex].updatedAt = new Date().toISOString();
         this.saveUsers(users);
         return theme;
     }
 
-    getThemes(adminId) {
+    getThemes(userId) {
         const users = this.loadUsers();
-        const user = users.find(u => u.id === adminId);
-        return user && user.platformData ? user.platformData.themes : [];
+        const user = users.find(u => u.id === userId);
+        if (!user) return [];
+        
+        // Asegurar estructura antes de devolver datos
+        const updatedUser = this.ensurePlatformDataStructure(user);
+        return updatedUser.platformData.themes || [];
     }
 
     // Métodos para estudiantes por admin
@@ -233,15 +285,8 @@ class DataService {
             createdAt: new Date().toISOString()
         };
 
-        if (!users[userIndex].platformData) {
-            users[userIndex].platformData = {
-                tokens: { used: 0, limit: 5000 },
-                students: [],
-                courses: [],
-                themes: [],
-                rankings: []
-            };
-        }
+        // Asegurar que la estructura de platformData esté completa
+        users[userIndex] = this.ensurePlatformDataStructure(users[userIndex]);
 
         users[userIndex].platformData.students.push(student);
         users[userIndex].updatedAt = new Date().toISOString();
@@ -295,15 +340,8 @@ class DataService {
             createdAt: new Date().toISOString()
         };
 
-        if (!users[userIndex].platformData) {
-            users[userIndex].platformData = {
-                tokens: { used: 0, limit: 5000 },
-                students: [],
-                courses: [],
-                themes: [],
-                rankings: []
-            };
-        }
+        // Asegurar que la estructura de platformData esté completa
+        users[userIndex] = this.ensurePlatformDataStructure(users[userIndex]);
 
         users[userIndex].platformData.rankings.push(ranking);
         users[userIndex].updatedAt = new Date().toISOString();
@@ -531,15 +569,8 @@ class DataService {
         const userIndex = users.findIndex(u => u.id === adminId);
         if (userIndex === -1) return null;
 
-        if (!users[userIndex].platformData) {
-            users[userIndex].platformData = {
-                tokens: { used: 0, limit: 5000 },
-                students: [],
-                courses: [],
-                themes: [],
-                rankings: []
-            };
-        }
+        // Asegurar que la estructura de platformData esté completa
+        users[userIndex] = this.ensurePlatformDataStructure(users[userIndex]);
 
         if (tokenData.used !== undefined) {
             users[userIndex].platformData.tokens.used = tokenData.used;

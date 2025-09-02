@@ -1,22 +1,44 @@
 const dataService = require('../services/dataService');
 
 const studentsController = {
-    // Obtener estudiantes de un admin
+    // Obtener estudiantes
     getStudents: async (req, res) => {
         try {
-            const adminId = req.user.userId;
+            const userId = req.user.userId;
+            const userRole = req.user.role;
             const { course } = req.query;
             
-            const admin = await dataService.findUserById(adminId);
-            if (!admin || admin.role !== 'admin') {
+            let targetUser;
+            
+            if (userRole === 'admin') {
+                // Si es admin, obtener sus propios estudiantes
+                targetUser = await dataService.findUserById(userId);
+            } else if (userRole === 'teacher') {
+                // Si es teacher, obtener estudiantes de su admin
+                const teacher = await dataService.findUserById(userId);
+                if (!teacher || !teacher.adminId) {
+                    return res.status(403).json({
+                        success: false,
+                        message: 'Teacher no tiene admin asignado'
+                    });
+                }
+                targetUser = await dataService.findUserById(teacher.adminId);
+            } else {
                 return res.status(403).json({
                     success: false,
-                    message: 'Solo los administradores pueden acceder a estudiantes'
+                    message: 'Acceso no autorizado'
+                });
+            }
+
+            if (!targetUser) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Usuario no encontrado'
                 });
             }
 
             // Los estudiantes están almacenados en platformData.students del admin
-            let students = admin.platformData?.students || [];
+            let students = targetUser.platformData?.students || [];
             
             // Filtrar por curso si se especifica
             if (course) {
@@ -36,7 +58,8 @@ const studentsController = {
     // Crear nuevo estudiante
     createStudent: async (req, res) => {
         try {
-            const adminId = req.user.userId;
+            const userId = req.user.userId;
+            const userRole = req.user.role;
             const { name, course } = req.body;
 
             if (!name || !course) {
@@ -46,11 +69,30 @@ const studentsController = {
                 });
             }
 
-            const admin = await dataService.findUserById(adminId);
-            if (!admin || admin.role !== 'admin') {
+            let admin;
+            
+            if (userRole === 'admin') {
+                admin = await dataService.findUserById(userId);
+            } else if (userRole === 'teacher') {
+                const teacher = await dataService.findUserById(userId);
+                if (!teacher || !teacher.adminId) {
+                    return res.status(403).json({
+                        success: false,
+                        message: 'Teacher no tiene admin asignado'
+                    });
+                }
+                admin = await dataService.findUserById(teacher.adminId);
+            } else {
                 return res.status(403).json({
                     success: false,
-                    message: 'Solo los administradores pueden crear estudiantes'
+                    message: 'Acceso no autorizado'
+                });
+            }
+
+            if (!admin) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Admin no encontrado'
                 });
             }
 
