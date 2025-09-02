@@ -69,23 +69,9 @@ const analysisController = {
             // Analizar el archivo utilizando el servicio de detección
             const analysisResult = await detectionService.analyzeFile(fileInfo.path, context);
             
-            // Actualizar tokens del admin después del análisis exitoso
-            if (analysisResult && analysisResult.analysis && analysisResult.analysis.usage && adminId) {
-                const tokenInfo = analysisResult.analysis.usage;
-                const totalTokensUsed = (tokenInfo.prompt_tokens || 0) + (tokenInfo.completion_tokens || 0);
-                
-                // Actualizar tokens del admin
-                const currentTokens = await dataService.getAdminTokensWithAccumulatedUsage(adminId);
-                if (currentTokens) {
-                    await dataService.updateTokens(adminId, {
-                        used: currentTokens.adminDirectUsage + totalTokensUsed,
-                        limit: currentTokens.limit
-                    });
-                }
-                
-                console.log(`Tokens actualizados para admin ${adminId}: +${totalTokensUsed} tokens`);
-                
-                // Eliminar la información de tokens del resultado que se envía al frontend
+            // Los tokens ya se actualizan automáticamente en openaiService.js
+            // Solo eliminamos la información de tokens del resultado que se envía al frontend
+            if (analysisResult && analysisResult.analysis && analysisResult.analysis.usage) {
                 delete analysisResult.analysis.usage;
             }
 

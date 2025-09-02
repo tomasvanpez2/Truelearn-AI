@@ -1,11 +1,11 @@
 /* Variables de colores para toda la aplicación */
 :root {
     /* Colores principales */
-    --color-primary: #38348a;
+    --color-primary: #3129b4;
     /* Azul principal */
-    --color-primary-dark: #2d2a6b;
+    --color-primary-dark: #3b3a39;
     /* Azul más oscuro para hover */
-    --color-primary-light: #4a45a3;
+    --color-primary-light: #4a3bc8;
     /* Azul más claro */
 
     --color-secondary: #fdc43a;
@@ -33,7 +33,7 @@
     /* Usar azul para información */
 
     /* Colores neutros */
-    --color-white: #ffffff;
+    --color-white: #e6e6e7;
     --color-light-gray: #f8f9fa;
     --color-gray: #6c757d;
     --color-dark-gray: #495057;

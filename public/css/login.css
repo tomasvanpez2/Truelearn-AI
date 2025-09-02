@@ -6,11 +6,11 @@
     justify-content: center;
     align-items: center;
     min-height: 100vh;
-    background: linear-gradient(to bottom, var(--color-tertiary-light), #ffffff);
+    background: linear-gradient(to bottom, var(--color-tertiary-light), var(--color-white));
 }
 
 .login-box {
-    background-color: #ffffff; 
+    background-color: var(--color-white); 
     padding: 2rem;
     border-radius: 8px;
     box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1); /* Sombra más sutil */
@@ -30,7 +30,7 @@
     width: 120px;
     height: auto;
     margin: 0 auto 1.5rem;
-    background-color: #FFFFFF; /* Fondo blanco para el logo */
+    background-color: var(--color-white); /* Fondo blanco para el logo */
     border-radius: 8px; /* Bordes redondeados para el logo */
     padding: 5px; /* Espacio alrededor del logo */
     box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1); /* Sombra sutil */
@@ -71,7 +71,7 @@
     width: 100%;
     padding: 0.75rem;
     background: var(--gradient-primary);
-    color: #ffffff;
+    color: var(--color-white);
     border: none;
     border-radius: 4px;
     font-size: 1rem;

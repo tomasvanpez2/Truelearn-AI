@@ -28,7 +28,7 @@
     border-radius: 4px;
     font-size: 1rem;
     color: #333;
-    background-color: #fff;
+    background-color: var(--color-white);
     transition: border-color 0.3s, box-shadow 0.3s;
 }
 
