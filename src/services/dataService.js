@@ -36,7 +36,7 @@ class DataService {
             
             // Los admins tienen límite de tokens
             if (user.platformData.tokens.limit === 0) {
-                user.platformData.tokens.limit = 5000;
+                user.platformData.tokens.limit = 900000;
             }
         } else if (user.role === 'teacher') {
             if (!user.platformData.themes) user.platformData.themes = [];
@@ -148,7 +148,7 @@ class DataService {
         let platformData = {};
         if (userData.role === 'admin') {
             platformData = {
-                tokens: { used: 0, limit: 5000 },
+                tokens: { used: 0, limit: 900000 },
                 students: [],
                 courses: [],
                 themes: [],
@@ -477,7 +477,7 @@ class DataService {
         // Obtener tokens con uso acumulado para admins
         const tokensData = user.role === 'admin' 
             ? this.getAdminTokensWithAccumulatedUsage(adminId)
-            : user.platformData?.tokens || { used: 0, limit: 5000 };
+            : user.platformData?.tokens || { used: 0, limit: 900000 };
 
         // Obtener tokens reales de estudiantes desde archivos (solo informativo)
         const studentsTokenData = this.getAdminStudentsTokensFromFiles(adminId);
@@ -540,7 +540,7 @@ class DataService {
         if (!admin) return null;
 
         const totalUsedTokens = this.calculateAdminTotalUsedTokens(adminId);
-        const adminLimit = admin.platformData?.tokens?.limit || 5000;
+    const adminLimit = admin.platformData?.tokens?.limit || 900000;
         const adminDirectUsage = admin.platformData?.tokens?.used || 0;
         
         // Obtener uso de profesores
@@ -598,7 +598,7 @@ class DataService {
 
         if (!users[teacherIndex].platformData) {
             users[teacherIndex].platformData = {
-                tokens: { used: 0, limit: 5000 }
+                tokens: { used: 0, limit: 900000 }
             };
         }
 
