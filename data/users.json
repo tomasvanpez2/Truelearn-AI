@@ -1,2 +1,57 @@
 [
+  {
+    "id": "1757097159391",
+    "name": "Angela Guio",
+    "email": "coordinadora.academica@gimnasiolaarboleda.edu.co",
+    "username": "Angeguia",
+    "password": "$2b$10$jF6bT8x7BCIHDGASONZYGOQQaR./RzT0HKOWiU3p3H6J1apZZRT32",
+    "role": "admin",
+    "active": true,
+    "platformData": {
+      "tokens": {
+        "used": 0,
+        "limit": 900000
+      },
+      "students": [
+        {
+          "id": "1757098000034",
+          "name": "san",
+          "course": "Grado 9º",
+          "createdAt": "2025-09-05T18:46:40.034Z"
+        }
+      ],
+      "courses": [],
+      "themes": [
+        {
+          "id": "1757097766024",
+          "name": "J.K ROWLING - Harry Potter",
+          "description": "Tema para Grado 9º - Español",
+          "createdAt": "2025-09-05T18:42:46.024Z"
+        }
+      ],
+      "rankings": []
+    },
+    "createdAt": "2025-09-05T18:32:39.391Z",
+    "updatedAt": "2025-09-05T18:46:40.035Z"
+  },
+  {
+    "id": "1757097302400",
+    "name": "Daniel Leonardo Rada Combariza",
+    "email": "cosmos.bachillerato@gimnasiolaarboleda.edu.co",
+    "username": "Danileoraco",
+    "password": "$2b$10$jBXaoMPq3NY15y7091NJI.KiF7Z26ZpTs/Qzrmdg.7doIcdZTQIgO",
+    "role": "teacher",
+    "subject": "Cosmos",
+    "active": true,
+    "adminId": "1757097159391",
+    "platformData": {
+      "tokens": {
+        "used": 0,
+        "limit": 0
+      },
+      "themes": []
+    },
+    "createdAt": "2025-09-05T18:35:02.400Z",
+    "updatedAt": "2025-09-05T18:35:02.400Z"
+  }
 ]

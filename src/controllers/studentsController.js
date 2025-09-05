@@ -60,6 +60,7 @@ const studentsController = {
         try {
             const userId = req.user.userId;
             const userRole = req.user.role;
+            const adminId = req.user.userId;
             const { name, course } = req.body;
 
             if (!name || !course) {
