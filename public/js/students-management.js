@@ -2,6 +2,7 @@
 
 let currentStudentId = null;
 let isEditMode = false;
+let students = []; // Almacenar estudiantes localmente
 
 // Inicializar la página
 document.addEventListener('DOMContentLoaded', function() {
@@ -57,10 +58,14 @@ async function loadStudents() {
         const data = await response.json();
 
         if (response.ok && data) {
-            displayStudents(data);
+            students = data; // Guardar datos localmente
+            displayStudents(students);
         } else {
             showError('Error cargando estudiantes: ' + (data.message || 'Error desconocido'));
-            displayStudents([]);
+            // No vaciar la tabla si ya hay datos locales
+            if (students.length === 0) {
+                displayStudents([]);
+            }
         }
     } catch (error) {
         console.error('Error:', error);
@@ -111,42 +116,23 @@ function openAddStudentModal() {
 }
 
 // Abrir modal para editar estudiante
-async function openEditStudentModal(studentId) {
-    try {
-        const token = localStorage.getItem('authToken');
-        const response = await fetch('/api/students', {
-            headers: {
-                'Authorization': `Bearer ${token}`,
-                'Content-Type': 'application/json'
-            }
-        });
+function openEditStudentModal(studentId) {
+    const student = students.find(s => s.id === studentId);
 
-        const students = await response.json();
+    if (student) {
+        isEditMode = true;
+        currentStudentId = studentId;
 
-        if (response.ok && students) {
-            const student = students.find(s => s.id === studentId);
+        document.getElementById('modal-title').textContent = 'Editar Estudiante';
+        document.getElementById('submit-btn').textContent = 'Actualizar Estudiante';
 
-            if (student) {
-                isEditMode = true;
-                currentStudentId = studentId;
+        // Llenar formulario con datos del estudiante
+        document.getElementById('student-name').value = student.name;
+        document.getElementById('student-course').value = student.course;
 
-                document.getElementById('modal-title').textContent = 'Editar Estudiante';
-                document.getElementById('submit-btn').textContent = 'Actualizar Estudiante';
-
-                // Llenar formulario con datos del estudiante
-                document.getElementById('student-name').value = student.name;
-                document.getElementById('student-course').value = student.course;
-
-                document.getElementById('student-modal').style.display = 'flex';
-            } else {
-                showError('Estudiante no encontrado');
-            }
-        } else {
-            showError('Error cargando datos del estudiante: ' + (students.message || 'Error desconocido'));
-        }
-    } catch (error) {
-        console.error('Error:', error);
-        showError('Error cargando datos del estudiante');
+        document.getElementById('student-modal').style.display = 'flex';
+    } else {
+        showError('Estudiante no encontrado');
     }
 }
 
@@ -192,7 +178,25 @@ async function handleStudentSubmit(e) {
         if (data.success) {
             showSuccess(data.message);
             closeStudentModal();
-            loadStudents();
+
+            if (isEditMode) {
+                // Actualizar estudiante existente localmente
+                const index = students.findIndex(s => s.id === currentStudentId);
+                if (index !== -1) {
+                    students[index] = { ...students[index], ...studentData, updatedAt: new Date().toISOString() };
+                }
+            } else {
+                // Agregar nuevo estudiante localmente
+                const newStudent = {
+                    id: data.student.id,
+                    name: studentData.name,
+                    course: studentData.course,
+                    createdAt: new Date().toISOString()
+                };
+                students.push(newStudent);
+            }
+
+            displayStudents(students);
         } else {
             showError(data.message || 'Error al guardar estudiante');
         }
@@ -229,7 +233,14 @@ async function deleteStudent(studentId) {
         if (data.success) {
             showSuccess(data.message);
             closeDeleteModal();
-            loadStudents();
+
+            // Eliminar estudiante localmente
+            const index = students.findIndex(s => s.id === studentId);
+            if (index !== -1) {
+                students.splice(index, 1);
+            }
+
+            displayStudents(students);
         } else {
             showError(data.message || 'Error al eliminar estudiante');
         }
