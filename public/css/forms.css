@@ -20,6 +20,7 @@
 .form-group input[type="number"],
 .form-group input[type="email"],
 .form-group input[type="password"],
+.form-group .password-input,
 .form-group textarea,
 .form-group select {
     width: 100%;
@@ -38,6 +39,7 @@
 }
 
 .form-group input:focus,
+.form-group .password-input:focus,
 .form-group textarea:focus,
 .form-group select:focus {
     outline: none;
@@ -46,6 +48,7 @@
 }
 
 .form-group input::placeholder,
+.form-group .password-input::placeholder,
 .form-group textarea::placeholder {
     color: #aaa;
 }
@@ -147,4 +150,58 @@
     .academic-info .form-group:nth-child(n) {
         grid-column: 1;
     }
+}
+/* Estilos para alternancia de visibilidad de contraseña */
+.password-container {
+    position: relative;
+}
+
+.password-input {
+    padding-right: 3rem; /* Espacio para el icono */
+}
+
+.password-toggle {
+    position: absolute;
+    right: 0.75rem;
+    top: 50%;
+    transform: translateY(-50%);
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #666;
+    font-size: 1.2rem;
+    padding: 0.25rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: color 0.3s;
+}
+
+.password-toggle:hover {
+    color: var(--color-primary);
+}
+
+.password-toggle::before {
+    content: '';
+    display: inline-block;
+    width: 16px;
+    height: 16px;
+    border: 2px solid currentColor;
+    border-radius: 50%;
+    position: relative;
+}
+
+.password-toggle::after {
+    content: '';
+    position: absolute;
+    top: 6px;
+    left: 6px;
+    width: 4px;
+    height: 4px;
+    background: currentColor;
+    border-radius: 50%;
+}
+
+.password-toggle.show {
+    opacity: 0.6;
 }

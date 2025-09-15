@@ -1,0 +1,229 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Panel de Control - GLA</title>
+    <link rel="stylesheet" href="/css/variables.css">
+    <link rel="stylesheet" href="/css/main.css">
+    <link rel="stylesheet" href="/css/epanel.css">
+</head>
+
+<body>
+    <div class="epanel-container">
+        <div class="epanel-header">
+            <h1>Panel de Control GLA</h1>
+            <p>Acceso directo a todas las funciones del sistema</p>
+        </div>
+
+        <div id="loading" class="loading">Cargando panel de control...</div>
+
+        <div id="dashboard-content" style="display: none;">
+            <div class="epanel-grid">
+                <a href="/dashboard.html" class="epanel-card">
+                    <span class="epanel-icon main">📊</span>
+                    <div class="epanel-title">Dashboard Principal</div>
+                    <div class="epanel-description">
+                        Panel principal para análisis de documentos y gestión de tokens
+                    </div>
+                    <div class="epanel-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Estado:</span>
+                            <span class="stat-value">Activo</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Función:</span>
+                            <span class="stat-value">Análisis IA</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/ai-dashboard.html" class="epanel-card">
+                    <span class="epanel-icon ai-icon">🤖</span>
+                    <div class="epanel-title">Detección de IA</div>
+                    <div class="epanel-description">
+                        Monitorea los porcentajes de IA detectados en los trabajos de los estudiantes
+                    </div>
+                    <div class="epanel-stats" id="ai-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Estudiantes analizados:</span>
+                            <span class="stat-value" id="ai-students">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Total análisis:</span>
+                            <span class="stat-value" id="ai-total">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Promedio IA:</span>
+                            <span class="stat-value" id="ai-average">-</span>
+                        </div>
+                    </div>
+                </a>
+
+                <a href="/tokens-dashboard.html" class="epanel-card">
+                    <span class="epanel-icon tokens-icon">📈</span>
+                    <div class="epanel-title">Consumo de Tokens</div>
+                    <div class="epanel-description">
+                        Revisa el consumo de tokens de la API y estadísticas de uso por estudiante
+                    </div>
+                    <div class="epanel-stats" id="tokens-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Usuarios activos:</span>
+                            <span class="stat-value" id="tokens-users">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Tokens totales:</span>
+                            <span class="stat-value" id="tokens-total">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Solicitudes:</span>
+                            <span class="stat-value" id="tokens-requests">-</span>
+                        </div>
+                    </div>
+                </a>
+
+                <div class="epanel-card admin-only" id="teachers-card">
+                    <span class="epanel-icon teachers-icon">👨‍🏫</span>
+                    <div class="epanel-title">Gestión de Profesores</div>
+                    <div class="epanel-description">
+                        Administra las cuentas de profesores de la plataforma
+                    </div>
+                    <div class="epanel-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Cuentas:</span>
+                            <span class="stat-value" id="teachers-count">-</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Función:</span>
+                            <span class="stat-value">Gestión completa</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="epanel-card" onclick="showSystemInfo()">
+                    <span class="epanel-icon settings-icon">⚙️</span>
+                    <div class="epanel-title">Información del Sistema</div>
+                    <div class="epanel-description">
+                        Información general del sistema y configuraciones
+                    </div>
+                    <div class="epanel-stats">
+                        <div class="stat-item">
+                            <span class="stat-label">Versión:</span>
+                            <span class="stat-value">1.1.0</span>
+                        </div>
+                        <div class="stat-item">
+                            <span class="stat-label">Estado:</span>
+                            <span class="stat-value">Operativo</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="logout-section">
+            <button class="logout-btn" onclick="logout()">Cerrar Sesión</button>
+        </div>
+    </div>
+
+    <script>
+        // Verificar autenticación
+        const token = localStorage.getItem('token') || localStorage.getItem('authToken');
+        const userRole = localStorage.getItem('userRole');
+
+        if (!token) {
+            alert('No estás autenticado. Redirigiendo al login...');
+            window.location.href = '/';
+        }
+
+        // Mostrar/ocultar elementos según el rol
+        if (userRole === 'admin') {
+            document.getElementById('teachers-card').style.display = 'block';
+            document.getElementById('teachers-card').addEventListener('click', function() {
+                window.location.href = '/teachers-management.html';
+            });
+        }
+
+        // Configurar headers para las peticiones
+        const headers = {
+            'Authorization': `Bearer ${token}`,
+            'Content-Type': 'application/json'
+        };
+
+        async function loadStats() {
+            try {
+                // Cargar estadísticas de IA
+                try {
+                    const aiResponse = await fetch('/api/ai-analysis/stats', { headers });
+                    const aiData = await aiResponse.json();
+                    if (aiData.success) {
+                        document.getElementById('ai-students').textContent = aiData.data.uniqueStudents;
+                        document.getElementById('ai-total').textContent = aiData.data.totalAnalyses;
+                        document.getElementById('ai-average').textContent = aiData.data.averageAI + '%';
+                    }
+                } catch (error) {
+                    console.log('No hay datos de IA disponibles');
+                }
+
+                // Cargar estadísticas de tokens
+                try {
+                    const tokensResponse = await fetch('/api/tokens/stats', { headers });
+                    const tokensData = await tokensResponse.json();
+                    if (tokensData.success) {
+                        document.getElementById('tokens-users').textContent = tokensData.data.totalUsers;
+                        document.getElementById('tokens-total').textContent = tokensData.data.totalSystemTokens.toLocaleString();
+                        document.getElementById('tokens-requests').textContent = tokensData.data.totalSystemRequests;
+                    }
+                } catch (error) {
+                    console.log('No hay datos de tokens disponibles');
+                }
+
+                // Cargar conteo de profesores (solo para admin)
+                if (userRole === 'admin') {
+                    try {
+                        const teachersResponse = await fetch('/api/admin/teachers', { headers });
+                        const teachersData = await teachersResponse.json();
+                        if (teachersData.success) {
+                            document.getElementById('teachers-count').textContent = teachersData.teachers.length;
+                        }
+                    } catch (error) {
+                        console.log('No hay datos de profesores disponibles');
+                        document.getElementById('teachers-count').textContent = '0';
+                    }
+                }
+
+                document.getElementById('loading').style.display = 'none';
+                document.getElementById('dashboard-content').style.display = 'block';
+            } catch (error) {
+                console.error('Error cargando estadísticas:', error);
+                document.getElementById('loading').textContent = 'Error cargando estadísticas';
+            }
+        }
+
+        function showSystemInfo() {
+            alert(`Sistema de Detección de IA GLA v1.1.0
+
+Estado: Operativo
+Última actualización: ${new Date().toLocaleDateString('es-ES')}
+Funcionalidades:
+• Detección de contenido generado por IA
+• Monitoreo de consumo de tokens
+• Gestión de estudiantes y cursos
+• Panel de control unificado`);
+        }
+
+        function logout() {
+            if (confirm('¿Estás seguro de que quieres cerrar sesión?')) {
+                localStorage.removeItem('token');
+                localStorage.removeItem('authToken');
+                localStorage.removeItem('userRole');
+                window.location.href = '/';
+            }
+        }
+
+        // Cargar estadísticas al iniciar
+        loadStats();
+    </script>
+</body>
+
+</html>

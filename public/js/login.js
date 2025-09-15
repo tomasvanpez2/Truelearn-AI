@@ -48,7 +48,7 @@ document.addEventListener('DOMContentLoaded', function() {
                 if (data.user.role === 'admin') {
                     window.location.href = '/teachers-management.html';
                 } else {
-                    window.location.href = '/selector.html';
+                    window.location.href = '/epanel.html';
                 }
             } else {
                 errorMessage.textContent = data.message || 'Credenciales inválidas';
@@ -72,13 +72,6 @@ document.addEventListener('DOMContentLoaded', function() {
     // Manejar cierre del modal
     closeBtn.addEventListener('click', function() {
         modal.style.display = 'none';
-    });
-
-    // Cerrar modal al hacer clic fuera de él
-    window.addEventListener('click', function(event) {
-        if (event.target === modal) {
-            modal.style.display = 'none';
-        }
     });
 
     // Manejar registro
@@ -142,6 +135,23 @@ document.addEventListener('DOMContentLoaded', function() {
         .catch(error => {
             console.error('Error:', error);
             registerErrorMessage.textContent = 'Error al conectar con el servidor';
+        });
+    });
+    // Funcionalidad de alternancia de visibilidad de contraseña
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.classList.add('show');
+            } else {
+                input.type = 'password';
+                this.classList.remove('show');
+            }
         });
     });
 });

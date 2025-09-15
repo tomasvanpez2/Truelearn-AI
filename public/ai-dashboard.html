@@ -274,7 +274,7 @@
             <p>Historial de porcentajes de IA detectados por estudiante</p>
         </div>
 
-        <a href="/selector.html" class="back-btn">← Volver al Selector</a>
+        <a href="/epanel.html" class="back-btn">← Volver al Panel</a>
         
         <button class="refresh-btn" onclick="loadData()">↻ Actualizar Datos</button>
 
@@ -329,7 +329,7 @@
         // Verificar que el usuario tenga permisos de admin
         if (userRole !== 'admin') {
             alert('No tienes permisos para acceder a este dashboard. Solo administradores pueden ver la detección de IA.');
-            window.location.href = '/selector.html';
+            window.location.href = '/epanel.html';
         }
 
         // Configurar headers para las peticiones

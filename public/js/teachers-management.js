@@ -41,6 +41,8 @@ function setupEventListeners() {
             closeDeleteModal();
         }
     });
+    // Funcionalidad de alternancia de visibilidad de contraseña
+    setupPasswordToggles();
 }
 
 // Cargar lista de profesores
@@ -336,6 +338,25 @@ function showError(message) {
     document.body.appendChild(notification);
     
     setTimeout(() => {
+// Configurar alternancia de visibilidad de contraseña
+function setupPasswordToggles() {
+    const passwordToggles = document.querySelectorAll('.password-toggle');
+
+    passwordToggles.forEach(toggle => {
+        toggle.addEventListener('click', function() {
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+
+            if (input.type === 'password') {
+                input.type = 'text';
+                this.classList.add('show');
+            } else {
+                input.type = 'password';
+                this.classList.remove('show');
+            }
+        });
+    });
+}
         notification.remove();
     }, 5000);
 }

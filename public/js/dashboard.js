@@ -57,7 +57,7 @@ document.addEventListener('DOMContentLoaded', function() {
         backButton.textContent = 'Cambiar Estudiante/Curso';
         backButton.className = 'btn btn-secondary';
         backButton.style.marginLeft = '20px';
-        backButton.onclick = () => window.location.href = '/selector.html';
+        backButton.onclick = () => window.location.href = '/epanel.html';
         welcomeSection.parentNode.insertBefore(backButton, welcomeSection.nextSibling);
     }
     

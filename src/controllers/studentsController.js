@@ -144,7 +144,8 @@ const studentsController = {
     // Actualizar estudiante
     updateStudent: async (req, res) => {
         try {
-            const adminId = req.user.userId;
+            const userId = req.user.userId;
+            const userRole = req.user.role;
             const { studentId } = req.params;
             const { name, course } = req.body;
 
@@ -155,11 +156,33 @@ const studentsController = {
                 });
             }
 
-            const admin = await dataService.findUserById(adminId);
-            if (!admin || admin.role !== 'admin') {
+            let admin;
+            let adminId;
+
+            if (userRole === 'admin') {
+                admin = await dataService.findUserById(userId);
+                adminId = userId;
+            } else if (userRole === 'teacher') {
+                const teacher = await dataService.findUserById(userId);
+                if (!teacher || !teacher.adminId) {
+                    return res.status(403).json({
+                        success: false,
+                        message: 'Teacher no tiene admin asignado'
+                    });
+                }
+                admin = await dataService.findUserById(teacher.adminId);
+                adminId = teacher.adminId;
+            } else {
                 return res.status(403).json({
                     success: false,
-                    message: 'Solo los administradores pueden actualizar estudiantes'
+                    message: 'Acceso no autorizado'
+                });
+            }
+
+            if (!admin) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Admin no encontrado'
                 });
             }
 
@@ -202,14 +225,37 @@ const studentsController = {
     // Eliminar estudiante
     deleteStudent: async (req, res) => {
         try {
-            const adminId = req.user.userId;
+            const userId = req.user.userId;
+            const userRole = req.user.role;
             const { studentId } = req.params;
 
-            const admin = await dataService.findUserById(adminId);
-            if (!admin || admin.role !== 'admin') {
+            let admin;
+            let adminId;
+
+            if (userRole === 'admin') {
+                admin = await dataService.findUserById(userId);
+                adminId = userId;
+            } else if (userRole === 'teacher') {
+                const teacher = await dataService.findUserById(userId);
+                if (!teacher || !teacher.adminId) {
+                    return res.status(403).json({
+                        success: false,
+                        message: 'Teacher no tiene admin asignado'
+                    });
+                }
+                admin = await dataService.findUserById(teacher.adminId);
+                adminId = teacher.adminId;
+            } else {
                 return res.status(403).json({
                     success: false,
-                    message: 'Solo los administradores pueden eliminar estudiantes'
+                    message: 'Acceso no autorizado'
+                });
+            }
+
+            if (!admin) {
+                return res.status(404).json({
+                    success: false,
+                    message: 'Admin no encontrado'
                 });
             }
 

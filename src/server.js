@@ -83,6 +83,16 @@ app.get('/teachers-management.html', (req, res) => {
     res.sendFile(path.join(__dirname, '../public/teachers-management.html'));
 });
 
+// Ruta de gestión de estudiantes (protegida por verificación de token en el frontend)
+app.get('/students-management.html', (req, res) => {
+    res.sendFile(path.join(__dirname, '../public/students-management.html'));
+});
+
+// Ruta alternativa para manejar error tipográfico
+app.get('/students-mangament.html', (req, res) => {
+    res.redirect('/students-management.html');
+});
+
 // Manejo de errores
 app.use((err, req, res, next) => {
     console.error(err.stack);

@@ -4,7 +4,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestión de Profesores - IA Co.</title>
+    <title>Gestión de Estudiantes - IA Co.</title>
     <link rel="stylesheet" href="/css/variables.css">
     <link rel="stylesheet" href="/css/main.css">
     <link rel="stylesheet" href="/css/dashboard.css">
@@ -31,16 +31,16 @@
     <main class="dashboard-main">
         <div class="container">
             <section class="page-header">
-                <h2>Gestión de Profesores</h2>
-                <p>Administre las cuentas de profesores de su plataforma</p>
+                <h2>Gestión de Estudiantes</h2>
+                <p>Administre los estudiantes de su plataforma</p>
             </section>
 
             <section class="teachers-actions">
-                <button id="add-teacher-btn" class="btn btn-primary">
+                <button id="add-student-btn" class="btn btn-primary">
                     <span class="icon">+</span>
-                    Agregar Profesor
+                    Agregar Estudiante
                 </button>
-                <button id="refresh-teachers-btn" class="btn btn-outline">
+                <button id="refresh-students-btn" class="btn btn-outline">
                     <span class="icon">↻</span>
                     Actualizar Lista
                 </button>
@@ -52,67 +52,52 @@
                         <thead>
                             <tr>
                                 <th>Nombre</th>
-                                <th>Email</th>
-                                <th>Usuario</th>
-                                <th>Materia</th>
-                                <th>Estado</th>
-                                <th>Fecha Creación</th>
+                                <th>Curso</th>
                                 <th>Acciones</th>
                             </tr>
                         </thead>
-                        <tbody id="teachers-table-body">
+                        <tbody id="students-table-body">
                             <tr>
-                                <td colspan="7" class="loading">Cargando profesores...</td>
+                                <td colspan="3" class="loading">Cargando estudiantes...</td>
                             </tr>
                         </tbody>
                     </table>
                 </div>
             </section>
 
-            <!-- Modal para agregar/editar profesor -->
-            <div id="teacher-modal" class="modal" style="display: none;">
+            <!-- Modal para agregar/editar estudiante -->
+            <div id="student-modal" class="modal" style="display: none;">
                 <div class="modal-content">
                     <div class="modal-header">
-                        <h4 id="modal-title">Agregar Profesor</h4>
-                        <button class="modal-close" onclick="closeTeacherModal()">&times;</button>
+                        <h4 id="modal-title">Agregar Estudiante</h4>
+                        <button class="modal-close" onclick="closeStudentModal()">&times;</button>
                     </div>
-                    <form id="teacher-form" class="teacher-form">
+                    <form id="student-form" class="teacher-form">
                         <div class="form-group">
-                            <label for="teacher-name">Nombre Completo:</label>
-                            <input type="text" id="teacher-name" name="name" required>
-                        </div>
-                        <div class="form-group">
-                            <label for="teacher-email">Email:</label>
-                            <input type="email" id="teacher-email" name="email" required>
+                            <label for="student-name">Nombre Completo:</label>
+                            <input type="text" id="student-name" name="name" required>
                         </div>
                         <div class="form-group">
-                            <label for="teacher-username">Nombre de Usuario:</label>
-                            <input type="text" id="teacher-username" name="username" required>
-                        </div>
-                        <div class="form-group" id="password-group">
-                            <label for="teacher-password">Contraseña:</label>
-                            <div class="password-container">
-                                <input type="password" id="teacher-password" name="password" minlength="6" class="password-input">
-                                <button type="button" class="password-toggle" data-target="teacher-password"></button>
-                            </div>
-                            <small>Mínimo 6 caracteres</small>
-                        </div>
-                        <div class="form-group">
-                            <label for="teacher-subject">Materia:</label>
-                            <input type="text" id="teacher-subject" name="subject"
-                                placeholder="Ej: Matemáticas, Historia, etc.">
-                        </div>
-                        <div class="form-group" id="active-group" style="display: none;">
-                            <label for="teacher-active">Estado:</label>
-                            <select id="teacher-active" name="active">
-                                <option value="true">Activo</option>
-                                <option value="false">Inactivo</option>
+                            <label for="student-course">Curso:</label>
+                            <select id="student-course" name="course" required>
+                                <option value="">Seleccionar curso</option>
+                                <option value="1">1° Grado</option>
+                                <option value="2">2° Grado</option>
+                                <option value="3">3° Grado</option>
+                                <option value="4">4° Grado</option>
+                                <option value="5">5° Grado</option>
+                                <option value="6">6° Grado</option>
+                                <option value="7">7° Grado</option>
+                                <option value="8">8° Grado</option>
+                                <option value="9">9° Grado</option>
+                                <option value="10">10° Grado</option>
+                                <option value="11">11° Grado</option>
                             </select>
                         </div>
                         <div class="form-actions">
-                            <button type="submit" class="btn btn-primary" id="submit-btn">Crear Profesor</button>
+                            <button type="submit" class="btn btn-primary" id="submit-btn">Crear Estudiante</button>
                             <button type="button" class="btn btn-outline"
-                                onclick="closeTeacherModal()">Cancelar</button>
+                                onclick="closeStudentModal()">Cancelar</button>
                         </div>
                     </form>
                 </div>
@@ -126,7 +111,7 @@
                         <button class="modal-close" onclick="closeDeleteModal()">&times;</button>
                     </div>
                     <div class="modal-body">
-                        <p>¿Está seguro de que desea eliminar al profesor <strong id="delete-teacher-name"></strong>?
+                        <p>¿Está seguro de que desea eliminar al estudiante <strong id="delete-student-name"></strong>?
                         </p>
                         <p class="warning">Esta acción no se puede deshacer.</p>
                     </div>
@@ -145,8 +130,7 @@
         </div>
     </footer>
 
-    <script src="/js/auth.js"></script>
-    <script src="/js/teachers-management.js"></script>
+    <script src="/js/students-management.js"></script>
 </body>
 
 </html>

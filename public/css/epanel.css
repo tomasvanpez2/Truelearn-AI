@@ -1,0 +1,149 @@
+/* Panel de Control - Estilos principales */
+.epanel-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 20px;
+}
+
+.epanel-header {
+    background: rgba(255, 255, 255, 0.95);
+    color: #333;
+    padding: 30px;
+    border-radius: 15px;
+    margin-bottom: 30px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+}
+
+.epanel-header h1 {
+    font-size: 2.5em;
+    margin-bottom: 10px;
+    background: linear-gradient(135deg, #38348a, #f1c40f);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+}
+
+.epanel-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 25px;
+    margin-bottom: 30px;
+}
+
+.epanel-card {
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 15px;
+    padding: 30px;
+    text-align: center;
+    box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+    backdrop-filter: blur(10px);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+    cursor: pointer;
+    text-decoration: none;
+    color: inherit;
+}
+
+.epanel-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 40px rgba(0, 0, 0, 0.2);
+}
+
+.epanel-icon {
+    font-size: 3em;
+    margin-bottom: 20px;
+    display: block;
+}
+
+.epanel-icon.main { color: #38348a; }
+.ai-icon { color: #38348a; }
+.tokens-icon { color: #f1c40f; }
+.users-icon { color: #e8e4ff; }
+.settings-icon { color: #38348a; }
+.teachers-icon { color: #27ae60; }
+
+.epanel-title {
+    font-size: 1.4em;
+    font-weight: bold;
+    margin-bottom: 10px;
+    color: #38348a;
+}
+
+.epanel-description {
+    color: #2c3e50;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+.epanel-stats {
+    background: #e8e4ff;
+    padding: 15px;
+    border-radius: 8px;
+    margin-top: 15px;
+}
+
+.stat-item {
+    display: flex;
+    justify-content: space-between;
+    margin-bottom: 8px;
+}
+
+.stat-item:last-child {
+    margin-bottom: 0;
+}
+
+.stat-label {
+    color: #2c3e50;
+    font-size: 0.9em;
+}
+
+.stat-value {
+    font-weight: bold;
+    color: #38348a;
+}
+
+.logout-section {
+    text-align: center;
+    margin-top: 40px;
+}
+
+.logout-btn {
+    background: white;
+    color: #38348a;
+    border: 2px solid #38348a;
+    padding: 12px 30px;
+    border-radius: 25px;
+    cursor: pointer;
+    font-size: 1em;
+    transition: all 0.3s;
+    text-decoration: none;
+    display: inline-block;
+    font-weight: 500;
+}
+
+.logout-btn:hover {
+    background: #38348a;
+    color: white;
+}
+
+.loading {
+    text-align: center;
+    color: rgba(255, 255, 255, 0.8);
+    font-size: 1.1em;
+}
+
+.admin-only {
+    display: none;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .epanel-grid {
+        grid-template-columns: 1fr;
+    }
+
+    .epanel-header h1 {
+        font-size: 2em;
+    }
+}
