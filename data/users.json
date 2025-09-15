@@ -1,23 +1,3 @@
 [
-  {
-    "id": "1757900233073",
-    "name": "a",
-    "email": "a@a.com",
-    "username": "a",
-    "password": "$2b$10$Cig.6gjeQZN/e7lM4NFv4ephAVWv.UGK6alU0e0Tc85f78jpg0dX.",
-    "role": "admin",
-    "active": true,
-    "platformData": {
-      "tokens": {
-        "used": 0,
-        "limit": 900000
-      },
-      "students": [],
-      "courses": [],
-      "themes": [],
-      "rankings": []
-    },
-    "createdAt": "2025-09-15T01:37:13.073Z",
-    "updatedAt": "2025-09-15T02:19:28.154Z"
-  }
+
 ]
