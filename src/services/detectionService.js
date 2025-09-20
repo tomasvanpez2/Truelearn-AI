@@ -21,8 +21,10 @@ class DetectionService {
 
             // Extraer texto del archivo
             console.log('🔍 [DEBUG] Extrayendo texto del archivo...');
+            console.log('🔍 [502-DEBUG] Ruta del archivo a procesar:', filePath);
             const extractedText = await fileParser.extractText(filePath);
             console.log('🔍 [DEBUG] Texto extraído, longitud:', extractedText ? extractedText.length : 'NULL');
+            console.log('🔍 [502-DEBUG] Primeros 200 caracteres del texto:', extractedText ? extractedText.substring(0, 200) : 'NULL');
 
             // Verificar que el texto tenga un tamaño adecuado
             if (!extractedText || extractedText.trim().length < 10) {

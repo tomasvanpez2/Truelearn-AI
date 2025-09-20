@@ -1,3 +1,18 @@
 [
-
+  {
+    "studentName": "a21",
+    "aiPercentage": 95,
+    "documentName": "Sin tiÌtulo.docx",
+    "grade": "10° Grado",
+    "timestamp": "2025-09-20T16:58:01.949Z",
+    "date": "20/9/2025"
+  },
+  {
+    "studentName": "a21",
+    "aiPercentage": 90,
+    "documentName": "Sin tiÌtulo.docx",
+    "grade": "10° Grado",
+    "timestamp": "2025-09-20T17:04:14.067Z",
+    "date": "20/9/2025"
+  }
 ]

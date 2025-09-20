@@ -94,6 +94,15 @@ class OpenAIService {
 
     async makeAPIRequest(url, requestBody) {
         const requestFn = async () => {
+            // Log para diagnosticar: key parcial y headers
+            const keyPreview = this.apiKey ? `${this.apiKey.substring(0, 10)}...${this.apiKey.substring(this.apiKey.length - 10)}` : 'undefined';
+            console.log('🔍 [DEBUG] API Key preview:', keyPreview);
+            console.log('🔍 [DEBUG] Request URL:', url);
+            console.log('🔍 [DEBUG] Request headers:', {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${keyPreview}`
+            });
+
             const response = await fetch(url, {
                 method: 'POST',
                 headers: {
@@ -105,25 +114,41 @@ class OpenAIService {
 
             if (!response.ok) {
                 const errorText = await response.text();
-                console.error('Error en la respuesta de OpenAI:', response.status, errorText);
-                
+                console.error('❌ [502-DEBUG] Error en la respuesta de OpenAI:', response.status, errorText);
+                console.error('❌ [502-DEBUG] Full error response:', errorText);
+                console.error('❌ [502-DEBUG] Response headers:', Object.fromEntries(response.headers.entries()));
+                console.error('❌ [502-DEBUG] Response status text:', response.statusText);
+                console.error('❌ [502-DEBUG] Request body length:', JSON.stringify(requestBody).length);
+
                 // Create error object with status for retry logic
                 const error = new Error();
                 error.status = response.status;
-                
-                // Handle OpenAI specific errors
+
+                // Handle OpenRouter specific errors
                 if (response.status === 401) {
-                    error.message = 'API key de OpenAI inválida o faltante';
+                    error.message = 'API key de OpenRouter inválida o faltante';
+                    console.error('❌ [502-DEBUG] Error 401: API key inválida');
                 } else if (response.status === 429) {
                     error.message = 'Rate limit excedido. Reintentando automáticamente...';
+                    console.error('❌ [502-DEBUG] Error 429: Rate limit excedido');
                 } else if (response.status === 400) {
                     error.message = 'Solicitud inválida a OpenAI. Verifica los parámetros del prompt o la longitud del texto.';
+                    console.error('❌ [502-DEBUG] Error 400: Solicitud inválida');
+                } else if (response.status === 502) {
+                    error.message = 'Error 502: Bad Gateway - El servidor upstream devolvió una respuesta inválida';
+                    console.error('❌ [502-DEBUG] Error 502 detectado: Bad Gateway');
+                } else if (response.status === 503) {
+                    error.message = 'Error 503: Service Unavailable - El servicio no está disponible temporalmente';
+                    console.error('❌ [502-DEBUG] Error 503: Service Unavailable');
                 } else {
                     error.message = `Error de OpenAI: ${response.status} - ${errorText}`;
+                    console.error('❌ [502-DEBUG] Error desconocido:', response.status);
                 }
-                
+
                 throw error;
             }
+
+            console.log('✅ [502-DEBUG] Respuesta OK de OpenAI, status:', response.status);
 
             return response.json();
         };

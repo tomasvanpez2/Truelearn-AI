@@ -92,6 +92,9 @@ function displayStudents(students) {
                     <button class="action-btn edit" onclick="openEditStudentModal('${student.id}')" title="Editar">
                         ✎
                     </button>
+                    <button class="action-btn select" onclick="selectStudent('${student.id}')" title="Seleccionar">
+                        ✓
+                    </button>
                     <button class="action-btn delete" onclick="openDeleteModal('${student.id}', '${escapeHtml(student.name)}')" title="Eliminar">
                         ×
                     </button>
@@ -262,6 +265,22 @@ function closeStudentModal() {
 function closeDeleteModal() {
     document.getElementById('delete-modal').style.display = 'none';
     currentStudentId = null;
+}
+
+// Seleccionar estudiante para análisis
+function selectStudent(studentId) {
+    const student = students.find(s => s.id === studentId);
+
+    if (student) {
+        // Guardar información del estudiante en localStorage
+        localStorage.setItem('selectedStudentName', student.name);
+        localStorage.setItem('selectedCourseName', `${student.course}° Grado`);
+
+        // Redirigir al dashboard
+        window.location.href = '/dashboard.html';
+    } else {
+        showError('Estudiante no encontrado');
+    }
 }
 
 // Cerrar sesión

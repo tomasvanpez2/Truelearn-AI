@@ -41,6 +41,76 @@
             margin-bottom: 30px;
         }
 
+        @media (max-width: 768px) {
+            .stats-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+
+            .stat-card {
+                padding: 15px;
+            }
+
+            .stat-number {
+                font-size: 2em;
+            }
+
+            .container {
+                padding: 15px;
+            }
+
+            .header {
+                padding: 20px;
+            }
+
+            .header h1 {
+                font-size: 1.5em;
+            }
+
+            .users-table {
+                overflow-x: auto;
+            }
+
+            table {
+                min-width: 600px;
+            }
+
+            th, td {
+                padding: 10px 8px;
+                font-size: 0.9em;
+            }
+
+            .refresh-btn {
+                width: 100%;
+                padding: 15px;
+            }
+
+            .modal-content {
+                width: 95%;
+                margin: 10% auto;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .stat-number {
+                font-size: 1.8em;
+            }
+
+            .header h1 {
+                font-size: 1.3em;
+            }
+
+            th, td {
+                padding: 8px 5px;
+                font-size: 0.8em;
+            }
+
+            .table-header {
+                padding: 15px;
+                font-size: 1em;
+            }
+        }
+
         .stat-card {
             background: white;
             padding: 20px;
@@ -366,35 +436,42 @@
                 const tokensLimit = student.tokens?.limit || 1000;
                 const entries = student.tokens?.entries || [];
                 const requestCount = entries.length;
-                
+
                 // Calcular tokens de entrada y salida
                 let inputTokens = 0;
                 let outputTokens = 0;
                 let lastAnalysis = 'Nunca';
-                
+
                 entries.forEach(entry => {
                     inputTokens += entry.inputTokens || 0;
                     outputTokens += entry.outputTokens || 0;
                 });
-                
+
                 if (entries.length > 0) {
                     const lastEntry = entries[entries.length - 1];
                     lastAnalysis = new Date(lastEntry.date).toLocaleDateString('es-ES');
                 }
-                
+
                 // Determinar estado
-                const percentage = (tokensUsed / tokensLimit) * 100;
                 let status = 'Activo';
                 let statusClass = 'btn-success';
-                
-                if (tokensUsed >= tokensLimit) {
-                    status = 'Agotado';
-                    statusClass = 'btn-danger';
-                } else if (percentage > 80) {
-                    status = 'Crítico';
-                    statusClass = 'btn-warning';
+
+                // Si el límite es 0, significa tokens ilimitados
+                if (tokensLimit === 0) {
+                    status = 'Ilimitado';
+                    statusClass = 'btn-info';
+                } else {
+                    const percentage = (tokensUsed / tokensLimit) * 100;
+
+                    if (tokensUsed >= tokensLimit) {
+                        status = 'Agotado';
+                        statusClass = 'btn-danger';
+                    } else if (percentage > 80) {
+                        status = 'Crítico';
+                        statusClass = 'btn-warning';
+                    }
                 }
-                
+
                 const row = document.createElement('tr');
                 row.innerHTML = `
                     <td><strong>${student.name}</strong><br><small>${student.course || 'Sin curso'}</small></td>
@@ -415,18 +492,24 @@
         }
 
         function checkTokenAlerts(students) {
-            const exhaustedStudents = students.filter(s => s.tokens?.used >= (s.tokens?.limit || 1000));
-            
+            // Solo verificar agotamiento para estudiantes con límite definido (no ilimitados)
+            const exhaustedStudents = students.filter(s => {
+                const limit = s.tokens?.limit || 1000;
+                const used = s.tokens?.used || 0;
+                // Si límite es 0, significa ilimitado, no verificar agotamiento
+                return limit > 0 && used >= limit;
+            });
+
             if (exhaustedStudents.length > 0) {
                 const names = exhaustedStudents.map(s => s.name).join(', ');
                 const alertDiv = document.createElement('div');
                 alertDiv.className = 'error';
                 alertDiv.innerHTML = `<strong>⚠️ ALERTA:</strong> Los siguientes estudiantes han agotado sus tokens: ${names}`;
-                
+
                 const container = document.querySelector('.container');
                 const header = container.querySelector('.header');
                 container.insertBefore(alertDiv, header.nextSibling);
-                
+
                 // Auto-remover después de 10 segundos
                 setTimeout(() => {
                     if (alertDiv.parentNode) {
@@ -448,7 +531,7 @@
                     if (student && student.tokens && student.tokens.entries) {
                         let logContent = `Log de Tokens - ${studentName}\n`;
                         logContent += `Total de tokens usados: ${student.tokens.used}\n`;
-                        logContent += `Límite: ${student.tokens.limit || 1000}\n`;
+                        logContent += `Límite: ${student.tokens.limit === 0 ? 'Ilimitado' : (student.tokens.limit || 1000)}\n`;
                         logContent += `Número de análisis: ${student.tokens.entries.length}\n\n`;
                         logContent += '--- Historial de Análisis ---\n\n';
                         
