@@ -7,7 +7,12 @@ const dataService = require('../services/dataService');
 const analysisController = {
     analyzeDocument: async (req, res) => {
         try {
+            console.log('🔍 [DEBUG] Iniciando análisis de documento');
+            console.log('🔍 [DEBUG] Archivo recibido:', req.file ? req.file.filename : 'NINGUNO');
+            console.log('🔍 [DEBUG] Usuario autenticado:', req.user ? req.user.userId : 'NO AUTH');
+
             if (!req.file) {
+                console.log('❌ [DEBUG] Error: No se ha proporcionado ningún archivo');
                 return res.status(400).json({
                     success: false,
                     message: 'No se ha proporcionado ningún archivo'
@@ -16,23 +21,33 @@ const analysisController = {
 
             // Verificar tokens antes del análisis
             let adminId = null;
-            
+            console.log('🔍 [DEBUG] Verificando tokens...');
+
             // Si el usuario está autenticado, obtener su admin
             if (req.user) {
+                console.log('🔍 [DEBUG] Usuario autenticado, rol:', req.user.role);
                 if (req.user.role === 'admin') {
                     adminId = req.user.userId;
+                    console.log('🔍 [DEBUG] Admin ID:', adminId);
                 } else if (req.user.role === 'teacher') {
                     // Buscar el admin del profesor
+                    console.log('🔍 [DEBUG] Buscando admin del profesor...');
                     const teacher = await dataService.findUserById(req.user.userId);
                     adminId = teacher?.adminId;
+                    console.log('🔍 [DEBUG] Admin ID del profesor:', adminId);
                 }
+            } else {
+                console.log('⚠️ [DEBUG] Usuario no autenticado');
             }
 
             // Si tenemos adminId, verificar límite de tokens
             if (adminId) {
+                console.log('🔍 [DEBUG] Verificando límite de tokens para admin:', adminId);
                 const tokenCheck = await dataService.canAdminAllowTokenUsage(adminId, 2000); // Estimado de tokens por análisis
-                
+                console.log('🔍 [DEBUG] Resultado verificación tokens:', tokenCheck);
+
                 if (!tokenCheck.allowed) {
+                    console.log('❌ [DEBUG] Tokens insuficientes');
                     return res.status(403).json({
                         success: false,
                         message: '❌ No tienes suficientes tokens para realizar este análisis',
@@ -45,6 +60,9 @@ const analysisController = {
                         }
                     });
                 }
+                console.log('✅ [DEBUG] Tokens suficientes');
+            } else {
+                console.log('⚠️ [DEBUG] No se verificaron tokens (sin adminId)');
             }
 
             const fileInfo = {
@@ -65,16 +83,21 @@ const analysisController = {
                 documentName: req.file.originalname || req.file.filename,
                 adminId: adminId // Pasar adminId al contexto
             };
-            
+
+            console.log('🔍 [DEBUG] Contexto extraído:', context);
+            console.log('🔍 [DEBUG] Llamando a detectionService.analyzeFile...');
+
             // Analizar el archivo utilizando el servicio de detección
             const analysisResult = await detectionService.analyzeFile(fileInfo.path, context);
-            
+            console.log('🔍 [DEBUG] Resultado del análisis:', analysisResult ? 'OK' : 'NULL');
+
             // Los tokens ya se actualizan automáticamente en openaiService.js
             // Solo eliminamos la información de tokens del resultado que se envía al frontend
             if (analysisResult && analysisResult.analysis && analysisResult.analysis.usage) {
                 delete analysisResult.analysis.usage;
             }
 
+            console.log('✅ [DEBUG] Análisis completado exitosamente');
             return res.json({
                 success: true,
                 message: 'Análisis completado',
@@ -83,11 +106,17 @@ const analysisController = {
             });
 
         } catch (error) {
-            console.error('Error en análisis:', error);
+            console.error('❌ [DEBUG] Error en análisis:', error);
+            console.error('❌ [DEBUG] Stack trace:', error.stack);
+            console.error('❌ [DEBUG] Tipo de error:', error.constructor.name);
             return res.status(500).json({
                 success: false,
                 message: 'Error al analizar el documento',
-                error: error.message
+                error: error.message,
+                debug: {
+                    type: error.constructor.name,
+                    stack: error.stack
+                }
             });
         }
     },

@@ -40,24 +40,7 @@ class OpenAIService {
                 await tokenLogger.logTokenUsage(context.studentName, data.usage, documentInfo);
             }
             
-            // Si hay adminId en el contexto, actualizar tokens del admin también
-            if (context && context.adminId && data.usage) {
-                const dataService = require('./dataService');
-                const totalTokensUsed = (data.usage.prompt_tokens || 0) + (data.usage.completion_tokens || 0);
-                
-                try {
-                    const currentTokens = await dataService.getAdminTokensWithAccumulatedUsage(context.adminId);
-                    if (currentTokens) {
-                        await dataService.updateTokens(context.adminId, {
-                            used: currentTokens.adminDirectUsage + totalTokensUsed,
-                            limit: currentTokens.limit
-                        });
-                        console.log(`Tokens del admin ${context.adminId} actualizados: +${totalTokensUsed}`);
-                    }
-                } catch (error) {
-                    console.error('Error actualizando tokens del admin:', error);
-                }
-            }
+            // Los tokens se actualizan en el controlador, no aquí para evitar duplicación
             
             return this.processResponse(data);
         } catch (error) {
@@ -85,24 +68,7 @@ class OpenAIService {
                 await tokenLogger.logTokenUsage(context.studentName, data.usage, documentInfo);
             }
             
-            // Si hay adminId en el contexto, actualizar tokens del admin también
-            if (context && context.adminId && data.usage) {
-                const dataService = require('./dataService');
-                const totalTokensUsed = (data.usage.prompt_tokens || 0) + (data.usage.completion_tokens || 0);
-                
-                try {
-                    const currentTokens = await dataService.getAdminTokensWithAccumulatedUsage(context.adminId);
-                    if (currentTokens) {
-                        await dataService.updateTokens(context.adminId, {
-                            used: currentTokens.adminDirectUsage + totalTokensUsed,
-                            limit: currentTokens.limit
-                        });
-                        console.log(`Tokens del admin ${context.adminId} actualizados: +${totalTokensUsed}`);
-                    }
-                } catch (error) {
-                    console.error('Error actualizando tokens del admin:', error);
-                }
-            }
+            // Los tokens se actualizan en el controlador, no aquí para evitar duplicación
             
             return this.processResponse(data);
         } catch (error) {

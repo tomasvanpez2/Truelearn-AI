@@ -15,21 +15,33 @@ class DetectionService {
      */
     async analyzeFile(filePath, context) {
         try {
+            console.log('🔍 [DEBUG] DetectionService: Iniciando análisis de archivo');
+            console.log('🔍 [DEBUG] Ruta del archivo:', filePath);
+            console.log('🔍 [DEBUG] Contexto:', context);
+
             // Extraer texto del archivo
+            console.log('🔍 [DEBUG] Extrayendo texto del archivo...');
             const extractedText = await fileParser.extractText(filePath);
-            
+            console.log('🔍 [DEBUG] Texto extraído, longitud:', extractedText ? extractedText.length : 'NULL');
+
             // Verificar que el texto tenga un tamaño adecuado
             if (!extractedText || extractedText.trim().length < 10) {
+                console.log('❌ [DEBUG] Texto demasiado corto para análisis');
                 throw new Error('El texto extraído es demasiado corto para un análisis preciso');
             }
 
+            console.log('🔍 [DEBUG] Enviando texto a OpenAI para análisis...');
             // Enviar el texto a la API para análisis
             const analysisResult = await this.openaiService.analyzeText(extractedText, context);
+            console.log('🔍 [DEBUG] Resultado de OpenAI:', analysisResult ? 'OK' : 'NULL');
             
             // Extraer el porcentaje de IA del resultado
             if (analysisResult && analysisResult.content && context.studentName) {
+                console.log('🔍 [DEBUG] Extrayendo porcentaje de IA...');
                 const aiPercentage = this.extractAIPercentage(analysisResult.content);
+                console.log('🔍 [DEBUG] Porcentaje extraído:', aiPercentage);
                 if (aiPercentage !== null) {
+                    console.log('🔍 [DEBUG] Guardando análisis en tracker...');
                     // Guardar el análisis en el tracker
                     await aiAnalysisTracker.saveAnalysis(
                         context.studentName,
@@ -37,16 +49,19 @@ class DetectionService {
                         context.documentName || 'Documento',
                         context.studentGrade || ''
                     );
+                    console.log('✅ [DEBUG] Análisis guardado en tracker');
                 }
             }
-            
+
+            console.log('✅ [DEBUG] DetectionService: Análisis completado exitosamente');
             return {
                 success: true,
                 text: extractedText.substring(0, 500) + '...', // Muestra solo una parte del texto
                 analysis: analysisResult
             };
         } catch (error) {
-            console.error('Error en el servicio de detección:', error);
+            console.error('❌ [DEBUG] Error en el servicio de detección:', error);
+            console.error('❌ [DEBUG] Stack trace:', error.stack);
             throw error;
         }
     }

@@ -205,6 +205,7 @@ document.addEventListener('DOMContentLoaded', function() {
             formData.append('document', fileInput.files[0]);
 
             // Enviar el archivo al servidor
+            console.log('🔍 [DEBUG] Enviando archivo al servidor...');
             fetch('/api/analysis/upload', {
                 method: 'POST',
                 headers: {
@@ -212,8 +213,16 @@ document.addEventListener('DOMContentLoaded', function() {
                 },
                 body: formData
             })
-            .then(response => response.json())
+            .then(response => {
+                console.log('🔍 [DEBUG] Respuesta HTTP status:', response.status);
+                console.log('🔍 [DEBUG] Respuesta OK:', response.ok);
+                if (!response.ok) {
+                    throw new Error(`HTTP ${response.status}: ${response.statusText}`);
+                }
+                return response.json();
+            })
             .then(data => {
+                console.log('🔍 [DEBUG] Datos recibidos:', data);
                 if (data.success) {
                     alert('Archivo subido correctamente. Iniciando análisis...');
                     // Aquí podríamos redirigir a una página de resultados
@@ -222,8 +231,9 @@ document.addEventListener('DOMContentLoaded', function() {
                 }
             })
             .catch(error => {
-                console.error('Error:', error);
-                alert('Error al conectar con el servidor');
+                console.error('❌ [DEBUG] Error en fetch:', error);
+                console.error('❌ [DEBUG] Tipo de error:', error.constructor.name);
+                alert('Error al conectar con el servidor: ' + error.message);
             });
         });
     }
